@@ -131,6 +131,14 @@ let evalprog filename  =
     if Filename.is_relative filename
     then Filename.concat (Sys.getcwd ()) filename
     else filename in
+  let error_handling m =
+      if !utest then (
+        printf "\n%s" (Ustring.to_utf8 (Msg.message2str m));
+        utest_fail := !utest_fail + 1;
+        utest_fail_local := !utest_fail_local + 1)
+      else
+        fprintf stderr "%s\n" (Ustring.to_utf8 (Msg.message2str m))
+  in
   if !utest then printf "%s: " filename;
   utest_fail_local := 0;
   begin try
@@ -138,6 +146,7 @@ let evalprog filename  =
     (parsed
      |> add_prelude
      |> merge_includes (Filename.dirname filename) [filename]
+     |> Typecheck.check
      |> Mlang.flatten
      |> Mlang.desugar_post_flatten
      |> debug_after_mlang
@@ -146,28 +155,10 @@ let evalprog filename  =
      |> Mexpr.eval builtin_sym2term
      |> fun _ -> ())
     with
-    | Lexer.Lex_error m ->
-      if !utest then (
-        printf "\n%s" (Ustring.to_utf8 (Msg.message2str m));
-        utest_fail := !utest_fail + 1;
-        utest_fail_local := !utest_fail_local + 1)
-      else
-        fprintf stderr "%s\n" (Ustring.to_utf8 (Msg.message2str m))
-    | Error m ->
-      if !utest then (
-        printf "\n%s" (Ustring.to_utf8 (Msg.message2str m));
-        utest_fail := !utest_fail + 1;
-        utest_fail_local := !utest_fail_local + 1)
-      else
-        fprintf stderr "%s\n" (Ustring.to_utf8 (Msg.message2str m))
-    | Parsing.Parse_error ->
-      if !utest then (
-        printf "\n%s" (Ustring.to_utf8 (Msg.message2str (Lexer.parse_error_message())));
-        utest_fail := !utest_fail + 1;
-        utest_fail_local := !utest_fail_local + 1)
-      else
-        fprintf stderr "%s\n"
-  (Ustring.to_utf8 (Msg.message2str (Lexer.parse_error_message())))
+    | Lexer.Lex_error m -> error_handling m
+    | Error m -> error_handling m
+    | Parsing.Parse_error -> error_handling (Lexer.parse_error_message())
+    | Typecheck.Typecheck_error m -> error_handling m
   end; parsed_files := [];
   if !utest && !utest_fail_local = 0 then printf " OK\n" else printf "\n"
 
@@ -267,6 +258,9 @@ let main =
   let speclist = [
 
     (* First character in description string must be a space for alignment! *)
+    "--type-check", Arg.Set(enable_type_check),
+    " Enables static type checking (experimental).";
+
     "--debug-parse", Arg.Set(enable_debug_after_parse),
     " Enables output of parsing.";
 
