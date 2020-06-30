@@ -19,4 +19,4 @@ exception Typecheck_error of Msg.message
 (* Perform the type checking of the whole program. Raises an exception if a type error is found.
    Otherwise, it returns the same program as given as the input. *)
 let check = function
-  | Program(l,i,t) -> Program(l,i,t)
+  | Program(l,i,t) ->  Program(l,i,t)
