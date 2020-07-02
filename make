@@ -39,6 +39,7 @@ runtests() {
     ../build/mi test mexpr
     ../build/mi test mlang
     ../build/mi test ext
+    ../build/mi test types --type-check
     cd ../stdlib
     ../build/mi test mexpr
     cd ..

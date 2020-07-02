@@ -10,7 +10,7 @@ utest () with () in
 utest () with {} in
 
 -- Constructor with arguments
-con K1 k2 in
+con K1 in
 con K2 in
 con K3 in
 utest K2() with K2() in

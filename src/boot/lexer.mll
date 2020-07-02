@@ -38,10 +38,12 @@ let reserved_strings = [
   ("mexpr",         fun(i) -> Parser.MEXPR{i=i;v=()});
   ("include",       fun(i) -> Parser.INCLUDE{i=i;v=()});
   ("never",         fun(i) -> Parser.NEVER{i=i;v=()});
+  ("extends",       fun(i) -> Parser.EXTENDS{i=i;v=()});
 
 
   (* v *)
   ("=",             fun(i) -> Parser.EQ{i=i;v=()});
+  ("+=",            fun(i) -> Parser.PLUSEQ{i=i;v=()});
   ("+",             fun(i) -> Parser.ADD{i=i;v=()});
   ("++",            fun(i) -> Parser.CONCAT{i=i;v=()});
 
@@ -149,7 +151,7 @@ let uident = ucase_letter (digit | '_' | us_letter)*
 
 let symtok =  "="  | "+" |  "-" | "*"  | "/" | "%"  | "<"  | "<=" | ">" | ">=" | "<<" | ">>" | ">>>" | "==" |
               "!=" | "!" | "&&" | "||" | "++"| "$" | "("  | ")"  | "["  | "]" | "{"  | "}"  |
-              "::" | ":" | ","  | "."  | "&" | "|" | "->" | "=>" | "++"
+              "::" | ":" | ","  | "."  | "&" | "|" | "->" | "=>" | "++" | "+="
 
 
 let line_comment = "//" [^ '\013' '\010']*

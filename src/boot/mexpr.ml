@@ -659,12 +659,8 @@ let rec eval (env : (sym * tm) list) (t : tm) =
   | TmRecord(fi,tms) -> TmRecord(fi,Record.map (eval env) tms)
   | TmRecordUpdate(fi,t1,l,t2) ->
      (match eval env t1 with
-      | TmRecord(fi,r) ->
-         if Record.mem l r
-         then TmRecord(fi, Record.add l (eval env t2) r)
-         else raise_error fi ("No label '" ^ Ustring.to_utf8 l ^
-                                        "' in record " ^ Ustring.to_utf8
-                                (ustring_of_tm (TmRecord(fi,r))))
+     | TmRecord(fi,r) -> TmRecord(fi, Record.add l (eval env t2) r)
+         (* Because of product extension, we allow an update to extend *)
       | v ->
          raise_error fi ("Cannot update the term. The term is not a record: "
                          ^ Ustring.to_utf8 (ustring_of_tm v)))

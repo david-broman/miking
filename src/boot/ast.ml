@@ -115,7 +115,8 @@ and const =
 (* Terms in MLang *)
 and cdecl   = CDecl   of info * ustring * ty
 and param   = Param   of info * ustring * ty
-and decl = (* TODO: Local? *)
+
+and decl =
 | Data     of info * ustring * cdecl list
 | Inter    of info * ustring * param list * (pat * tm) list
 

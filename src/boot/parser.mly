@@ -64,8 +64,10 @@
 %token <unit Ast.tokendata> MEXPR
 %token <unit Ast.tokendata> INCLUDE
 %token <unit Ast.tokendata> NEVER
+%token <unit Ast.tokendata> EXTENDS
 
 %token <unit Ast.tokendata> EQ            /* "="   */
+%token <unit Ast.tokendata> PLUSEQ        /* "+="  */
 %token <unit Ast.tokendata> ARROW         /* "->"  */
 %token <unit Ast.tokendata> ADD           /* "+"   */
 
@@ -178,18 +180,30 @@ lang_body:
     { $1 }
   |
     { [] }
+
+
+
 decls:
   | decl decls
     { $1 :: $2 }
   |
     { [] }
+
 decl:
   | SYN type_ident EQ constrs
     { let fi = mkinfo $1.i $3.i in
       Data (fi, $2.v, $4) }
-  | SEM var_ident params EQ cases
-    { let fi = mkinfo $1.i $4.i in
-      Inter (fi, $2.v, $3, $5) }
+  | SYN type_ident
+    { Data ($1.i, $2.v, []) }
+  | SYN type_ident PLUSEQ constrs
+    { let fi = mkinfo $1.i $3.i in
+      Data (fi, $2.v, $4) }
+  | SYN type_ident EXTENDS type_ident EQ constrs
+    { let fi = mkinfo $1.i $5.i in
+      Data (fi, $2.v, $6) }
+  | SEM var_ident ty_op params EQ cases
+    { let fi = mkinfo $1.i $5.i in
+      Inter (fi, $2.v, $4, $6) }
 
 constrs:
   | constr constrs
