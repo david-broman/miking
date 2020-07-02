@@ -94,9 +94,9 @@ let compute_lang_data (Lang(info, _, _, decls)): lang_data =
     | None -> Some data
     | Some {info; _} -> raise_error fi ("Duplicate definition of '" ^ Ustring.to_utf8 name ^ "', previously defined at " ^ Ustring.to_utf8 (info2str info)) in
   let add_decl lang_data = function
-    | Data(fi, name, cons) ->
+    | Syn(fi, _, name, cons) ->
        {lang_data with syns = Record.update name (add_new_syn name (fi, cons)) lang_data.syns}
-    | Inter(fi, name, params, cases) ->
+    | Sem(fi, name, params, cases) ->
        let mk_case (pat, rhs) =
          let pos_pat = pat_to_normpat pat in
          (pat_info pat, {pat; rhs; pos_pat; neg_pat = normpat_complement pos_pat}) in
@@ -150,14 +150,14 @@ let data_to_lang info name includes {inters; syns}: mlang =
   let info_assoc fi l = List.find (fun (fi2, _) -> eq_info fi fi2) l |> snd in
   let syns =
     Record.bindings syns
-    |> List.map (fun (syn_name, (fi, cons)) -> Data(fi, syn_name, cons)) in
+     |> List.map (fun (syn_name, (fi, cons)) -> Syn(fi, SynDef, syn_name, cons)) in   (* Unclear what kind of Syn that is created *)
   let sort_inter name {info; params; cases; subsets} =
     let mk_case fi = let case = info_assoc fi cases in (case.pat, case.rhs) in
     let cases =
       List.map fst cases
       |> topo_sort eq_info subsets
       |> List.map mk_case in
-    Inter(info, name, params, cases) in
+    Sem(info, name, params, cases) in
   let inters =
     Record.bindings inters
     |> List.map (fun (name, inter_data) -> sort_inter name inter_data) in
@@ -318,16 +318,16 @@ let desugar_top (nss, (stack : (tm -> tm) list)) = function
      let mangle str = langName ^. us"_" ^. str in
      let cdecl_names (CDecl(_, name, _)) = (name, mangle name) in
      let add_decl {constructors; normals} = function
-       | Data (_, _, cdecls) ->
+       | Syn(_, _, _, cdecls) ->
           let new_constructors = List.to_seq cdecls |> Seq.map cdecl_names
           in {constructors = USMap.add_seq new_constructors constructors; normals}
-       | Inter (_, name, _, _) -> {normals = USMap.add name (mangle name) normals; constructors} in
+       | Sem(_, name, _, _) -> {normals = USMap.add name (mangle name) normals; constructors} in
      let ns = List.fold_left add_decl previous_ns decls in
      (* wrap in "con"s *)
      let wrap_con ty_name (CDecl(fi, cname, ty)) tm =
        TmCondef(fi, mangle cname, nosym, TyArrow(ty, TyCon ty_name), tm) in (* TODO(vipa): the type will likely be incorrect once we start doing product extensions of constructors *)
      let wrap_data decl tm = match decl with (* TODO(vipa): this does not declare the type itself *)
-       | Data(_, name, cdecls) -> List.fold_right (wrap_con name) cdecls tm
+       | Syn(_, _, name, cdecls) -> List.fold_right (wrap_con name) cdecls tm
        | _ -> tm in
      (* translate "Inter"s into (info * ustring * tm) *)
      let inter_to_tm fname fi params cases =
@@ -337,7 +337,7 @@ let desugar_top (nss, (stack : (tm -> tm) list)) = function
           |> List.fold_right wrap_param params
           |> desugar_tm nss ns in
      let translate_inter = function
-       | Inter(fi, name, params, cases) -> Some (fi, mangle name, nosym, inter_to_tm name fi params cases)
+       | Sem(fi, name, params, cases) -> Some (fi, mangle name, nosym, inter_to_tm name fi params cases)
        | _ -> None in
      (* put translated inters in a single letrec, then wrap in cons, then done *)
      let wrap tm = TmRecLets(NoInfo, List.filter_map translate_inter decls, tm)

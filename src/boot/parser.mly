@@ -192,18 +192,18 @@ decls:
 decl:
   | SYN type_ident EQ constrs
     { let fi = mkinfo $1.i $3.i in
-      Data (fi, $2.v, $4) }
+      Syn (fi, SynDef, $2.v, $4) }
   | SYN type_ident
-    { Data ($1.i, $2.v, []) }
+    { Syn ($1.i, SynDef, $2.v, []) }
   | SYN type_ident PLUSEQ constrs
     { let fi = mkinfo $1.i $3.i in
-      Data (fi, $2.v, $4) }
+      Syn (fi, SynSumExt, $2.v, $4) }
   | SYN type_ident EXTENDS type_ident EQ constrs
     { let fi = mkinfo $1.i $5.i in
-      Data (fi, $2.v, $6) }
+      Syn (fi, SynProdExt($4.v), $2.v, $6) }
   | SEM var_ident ty_op params EQ cases
     { let fi = mkinfo $1.i $5.i in
-      Inter (fi, $2.v, $4, $6) }
+      Sem (fi, $2.v, $4, $6) }
 
 constrs:
   | constr constrs

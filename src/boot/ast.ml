@@ -112,23 +112,26 @@ and const =
 (* External functions TODO: Should not be part of core language *)
 | CExt of tm Extast.ext
 
+
 (* Terms in MLang *)
 and cdecl   = CDecl   of info * ustring * ty
 and param   = Param   of info * ustring * ty
 
+and syn_type = SynDef | SynSumExt | SynProdExt of ustring
+
 and decl =
-| Data     of info * ustring * cdecl list
-| Inter    of info * ustring * param list * (pat * tm) list
+| Syn of info * syn_type * ustring * cdecl list
+| Sem of info * ustring * param list * (pat * tm) list
 
 and mlang   = Lang of info * ustring * ustring list * decl list
 and let_decl = Let of info * ustring * tm
 and rec_let_decl = RecLet of info * (info * ustring * tm) list
 and con_decl = Con of info * ustring * ty
 and top =
-| TopLang of mlang
-| TopLet  of let_decl
+| TopLang   of mlang
+| TopLet    of let_decl
 | TopRecLet of rec_let_decl
-| TopCon of con_decl
+| TopCon    of con_decl
 
 and include_ = Include of info * ustring
 and program = Program of include_ list * top list * tm
