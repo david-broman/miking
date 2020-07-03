@@ -64,12 +64,15 @@
 %token <unit Ast.tokendata> MEXPR
 %token <unit Ast.tokendata> INCLUDE
 %token <unit Ast.tokendata> NEVER
-%token <unit Ast.tokendata> EXTENDS
+%token <unit Ast.tokendata> OF
+%token <unit Ast.tokendata> EXT
+%token <unit Ast.tokendata> ALL
 
 %token <unit Ast.tokendata> EQ            /* "="   */
 %token <unit Ast.tokendata> PLUSEQ        /* "+="  */
 %token <unit Ast.tokendata> ARROW         /* "->"  */
 %token <unit Ast.tokendata> ADD           /* "+"   */
+%token <unit Ast.tokendata> MUL           /* "*"   */
 
 /* Symbolic Tokens */
 %token <unit Ast.tokendata> LPAREN        /* "("   */
@@ -79,6 +82,7 @@
 %token <unit Ast.tokendata> LBRACKET      /* "{"   */
 %token <unit Ast.tokendata> RBRACKET      /* "}"   */
 %token <unit Ast.tokendata> COLON         /* ":"   */
+%token <unit Ast.tokendata> COLONCOLON    /* "::"  */
 %token <unit Ast.tokendata> COMMA         /* ","   */
 %token <unit Ast.tokendata> DOT           /* "."   */
 %token <unit Ast.tokendata> BAR           /* "|"   */
@@ -198,9 +202,9 @@ decl:
   | SYN type_ident PLUSEQ constrs
     { let fi = mkinfo $1.i $3.i in
       Syn (fi, SynSumExt, $2.v, $4) }
-  | SYN type_ident EXTENDS type_ident EQ constrs
+  | EXT type_ident OF type_ident EQ constrs
     { let fi = mkinfo $1.i $5.i in
-      Syn (fi, SynProdExt($4.v), $2.v, $6) }
+      Syn (fi, SynProdExt($2.v), $4.v, $6) }
   | SEM var_ident ty_op params EQ cases
     { let fi = mkinfo $1.i $5.i in
       Sem (fi, $2.v, $4, $6) }
@@ -304,7 +308,7 @@ atom:
       { if List.length $2 = 1 then List.hd $2
         else tuple2record (mkinfo $1.i $3.i) $2 }
   | LPAREN RPAREN        { TmRecord($1.i, Record.empty) }
-  | var_ident                { TmVar($1.i,$1.v,nosym) }
+  | var_ident            { TmVar($1.i,$1.v,nosym) }
   | CHAR                 { TmConst($1.i, CChar(List.hd (ustring2list $1.v))) }
   | UINT                 { TmConst($1.i,CInt($1.v)) }
   | UFLOAT               { TmConst($1.i,CFloat($1.v)) }
@@ -435,11 +439,23 @@ ty_op:
 
 
 ty:
-  | ty_atom
+  | ty_arrow
       { $1 }
-  | ty_atom ARROW ty
+  | ALL var_ident COLONCOLON ty DOT ty
+      { TyDyn (* TEMP - add correct type *) }
+
+
+ty_arrow:
+  | ty_prodext
+      { $1 }
+  | ty_prodext ARROW ty
       { TyArrow($1,$3) }
 
+ty_prodext:
+  | ty_atom
+      { $1 }
+  | ty_prodext MUL ty_atom
+      { TyProdExt($1,$3) }
 
 ty_atom:
   | LPAREN RPAREN

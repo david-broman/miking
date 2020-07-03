@@ -62,10 +62,10 @@ recursive
 end
 
 recursive
-  let all = lam p. lam seq.
+  let allSeq = lam p. lam seq.
     if null seq
     then true
-    else and (p (head seq)) (all p (tail seq))
+    else and (p (head seq)) (allSeq p (tail seq))
 end
 
 -- Join
@@ -210,9 +210,9 @@ utest join [[],[],[]] with [] in
 utest any (lam x. eqi x 1) [0, 4, 1, 2] with true in
 utest any (lam x. eqi x 5) [0, 4, 1, 2] with false in
 utest any (lam x. true) [] with false in
-utest all (lam x. eqi x 1) [1, 1, 1, 2] with false in
-utest all (lam x. eqi x 0) [0, 0, 0] with true in
-utest all (lam x. eqi x 1) [] with true in
+utest allSeq (lam x. eqi x 1) [1, 1, 1, 2] with false in
+utest allSeq (lam x. eqi x 0) [0, 0, 0] with true in
+utest allSeq (lam x. eqi x 1) [] with true in
 
 utest filter (lam x. eqi x 1) [1,2,4] with [1] in
 utest filter (lam _. false) [3,5,234,1,43] with [] in

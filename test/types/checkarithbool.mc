@@ -12,15 +12,15 @@ lang CheckArith = ArithSyntax + TypeSyntax
   syn Ty +=
   | TyInt {}
 
-  syn TmExt extends Tm =
+  ext ExtTm of Tm =
   | TmLit {ty: Ty}
   | TmAdd {ty: Ty}
 
-  sem getType: TmExt -> Ty =
+  sem getType: all e :: ExtTm * tm. e * ExtTm * tm -> Ty =
   | TmLit r -> r.ty
   | TmAdd r -> r.ty
 
-  sem typecheck: Tm -> TmExt =
+  sem typecheck: all e :: ExtTm * Tm. e * tm -> e * ExtTm * tm =
   | TmLit r -> TmLit {r with ty = TyInt{}}
   | TmAdd r ->
     let left2 = typecheck r.left in

@@ -191,11 +191,12 @@ and ty =
 | TyInt                                           (* Int type *)
 | TyFloat                                         (* Floating-point type *)
 | TyChar                                          (* Character type *)
-| TyArrow  of ty * ty                             (* Function type *)
-| TySeq    of ty                                  (* Sequence type *)
-| TyTuple  of ty list                             (* Tuple type *)
-| TyRecord of (ustring * ty) list                 (* Record type *)
-| TyCon    of ustring                             (* Type constructor *)
+| TyArrow   of ty * ty                            (* Function type *)
+| TySeq     of ty                                 (* Sequence type *)
+| TyTuple   of ty list                            (* Tuple type *)
+| TyRecord  of (ustring * ty) list                (* Record type *)
+| TyCon     of ustring                            (* Type constructor *)
+| TyProdExt of ty * ty                            (* Product extension *)
 
 
 (* Kind of identifier *)

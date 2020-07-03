@@ -38,7 +38,9 @@ let reserved_strings = [
   ("mexpr",         fun(i) -> Parser.MEXPR{i=i;v=()});
   ("include",       fun(i) -> Parser.INCLUDE{i=i;v=()});
   ("never",         fun(i) -> Parser.NEVER{i=i;v=()});
-  ("extends",       fun(i) -> Parser.EXTENDS{i=i;v=()});
+  ("of",            fun(i) -> Parser.OF{i=i;v=()});
+  ("ext",           fun(i) -> Parser.EXT{i=i;v=()});
+  ("all",           fun(i) -> Parser.ALL{i=i;v=()});
 
 
   (* v *)
@@ -55,12 +57,14 @@ let reserved_strings = [
   ("{",             fun(i) -> Parser.LBRACKET{i=i;v=()});
   ("}",             fun(i) -> Parser.RBRACKET{i=i;v=()});
   (":",             fun(i) -> Parser.COLON{i=i;v=()});
+  ("::",            fun(i) -> Parser.COLONCOLON{i=i;v=()});
   (",",             fun(i) -> Parser.COMMA{i=i;v=()});
   (".",             fun(i) -> Parser.DOT{i=i;v=()});
   ("|",             fun(i) -> Parser.BAR{i=i;v=()});
   ("&",             fun(i) -> Parser.AND{i=i;v=()});
   ("!",             fun(i) -> Parser.NOT{i=i;v=()});
   ("->",            fun(i) -> Parser.ARROW{i=i;v=()});
+  ("*",             fun(i) -> Parser.MUL{i=i;v=()});
 
 ]
 
