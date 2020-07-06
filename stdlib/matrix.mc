@@ -6,7 +6,7 @@ include "vec.mc"
 -- True if mtx is a matrix, otherwise false.
 let matrixIsMatrix = lam mtx.
   and (not (null mtx))
-      (all (lam row. and (eqi (length (head mtx)) (length row))
+      (forall (lam row. and (eqi (length (head mtx)) (length row))
                          (gti (length row) 0))
            mtx)
 

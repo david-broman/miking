@@ -205,7 +205,7 @@ lang SeqPrettyPrint = SeqAst + ConstPrettyPrint + CharAst
         else None ()
       in
       let is_char = lam e. match extract_char e with Some c then true else false in
-      if all is_char t.tms then
+      if forall is_char t.tms then
         concat "\"" (concat (map (lam e. match extract_char e with Some c then c else '?') t.tms)
                             "\"")
       else
@@ -385,7 +385,7 @@ in
 --         else not (even (subi x 1))
 -- in
 let funcs_evenodd =
-    reclets_add "even" (None ()) 
+    reclets_add "even" (None ())
         (lam_ "x" (None ())
             (if_ (eqi_ (var_ "x") (int_ 0))
                  (true_)

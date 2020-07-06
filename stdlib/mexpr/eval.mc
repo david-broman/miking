@@ -644,13 +644,13 @@ lang MExprEval = FunEval + LetEval + RecLetsEval + SeqEval + TupleEval + RecordE
   sem tupleEq (tms1 : [Expr]) =
   | TmTuple t ->
     and (eqi (length tms1) (length t.tms))
-        (all (lam b. b) (zipWith eq tms1 t.tms))
+        (forall (lam b. b) (zipWith eq tms1 t.tms))
   | _ -> false
 
   sem recordEq (bindings1 : [{key : String, value : Expr}]) =
   | TmRecord t ->
     and (eqi (length bindings1) (length t.bindings))
-        (all (lam e1. any (lam e2. and (eqstr e1.key e2.key)
+        (forall (lam e1. any (lam e2. and (eqstr e1.key e2.key)
                                        (eq e1.value e2.value))
                           (bindings1))
              (t.bindings))
@@ -659,7 +659,7 @@ lang MExprEval = FunEval + LetEval + RecLetsEval + SeqEval + TupleEval + RecordE
   sem seqEq (seq1 : [Expr]) =
   | TmSeq s ->
     and (eqi (length seq1) (length s.tms))
-        (all (lam b.b) (zipWith eq seq1 s.tms))
+        (forall (lam b.b) (zipWith eq seq1 s.tms))
   | _ -> false
 end
 

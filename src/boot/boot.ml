@@ -144,7 +144,7 @@ let evalprog filename  =
   begin try
     let parsed = parse_mcore_file filename in
     (parsed
-     |> add_prelude
+     |> (if !no_prelude then fun x -> x else add_prelude)
      |> merge_includes (Filename.dirname filename) [filename]
      |> Typecheck.check
      |> Mlang.flatten
@@ -260,6 +260,9 @@ let main =
     (* First character in description string must be a space for alignment! *)
     "--type-check", Arg.Set(enable_type_check),
     " Enables static type checking (experimental).";
+
+    "--no-prelude", Arg.Set(no_prelude),
+    " Do not load the prelude.";
 
     "--debug-parse", Arg.Set(enable_debug_after_parse),
     " Enables output of parsing.";

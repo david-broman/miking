@@ -20,6 +20,7 @@ let enable_debug_symbol_print = ref false
 
 (* Other options *)
 let enable_type_check = ref false
+let no_prelude = ref false
 
 let utest = ref false           (* Set to true if unit testing is enabled *)
 let utest_ok = ref 0            (* Counts the number of successful unit tests *)

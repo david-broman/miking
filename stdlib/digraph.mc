@@ -57,7 +57,7 @@ let digraphCountEdges = lam g. length (digraphEdges g)
 let digraphHasVertex = lam v. lam g. any (g.eqv v) (digraphVertices g)
 
 let digraphHasVertices = lam vs. lam g.
-                         all (lam b. b) (map (lam v. digraphHasVertex v g) vs)
+                         forall (lam b. b) (map (lam v. digraphHasVertex v g) vs)
 
 -- Edges e1 and e2 equal in graph g.
 let digraphEdgeEq = lam g. lam e1. lam e2.

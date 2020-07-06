@@ -65,7 +65,7 @@ let samePaths = lam eq. lam seq1. lam seq2.
     -- equal number of paths
     (eqi (length seq1) (length seq2))
     -- each path in seq1 exists in seq2
-    (all (lam p. optionIsSome (find (eqpath eq p) seq2)) seq1)
+    (forall (lam p. optionIsSome (find (eqpath eq p) seq2)) seq1)
 in
 
 -- Create some labels

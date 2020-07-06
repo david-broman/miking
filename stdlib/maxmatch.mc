@@ -77,7 +77,7 @@ let debugShowState = lam state.
 let cmpSlack = lam l. lam r. subi l.val r.val
 
 let isMatch = lam x. neqi x (negi 1)
-let isPerfectMatch = all isMatch
+let isPerfectMatch = forall isMatch
 
 let findNonCovered = lam x.
   optionGetOrElse (lam _. error "All nodes are covered")
