@@ -1,3 +1,5 @@
+(* See https://github.com/ocaml-batteries-team/batteries-included/blob/master/src/batFingerTree.mli *)
+
 type 'a t = 'a BatFingerTree.t
 
 let of_list = BatFingerTree.of_list
@@ -48,3 +50,6 @@ let combine s1 s2 =
 
 let fold_right2 f s1 s2 a =
   fold_right (fun x a -> f (fst x) (snd x) a) (combine s1 s2) a
+
+let front = BatFingerTree.front
+let iter = BatFingerTree.iter

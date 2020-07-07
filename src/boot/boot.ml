@@ -146,19 +146,18 @@ let evalprog filename  =
     (parsed
      |> (if !no_prelude then fun x -> x else add_prelude)
      |> merge_includes (Filename.dirname filename) [filename]
-     |> Typecheck.check
      |> Mlang.flatten
      |> Mlang.desugar_post_flatten
      |> debug_after_mlang
      |> Mexpr.symbolize builtin_name2sym
      |> debug_after_symbolize
+     |> Typecheck.typecheck
      |> Mexpr.eval builtin_sym2term
      |> fun _ -> ())
     with
     | Lexer.Lex_error m -> error_handling m
     | Error m -> error_handling m
     | Parsing.Parse_error -> error_handling (Lexer.parse_error_message())
-    | Typecheck.Typecheck_error m -> error_handling m
   end; parsed_files := [];
   if !utest && !utest_fail_local = 0 then printf " OK\n" else printf "\n"
 
