@@ -72,7 +72,7 @@
 %token <unit Ast.tokendata> PLUSEQ        /* "+="  */
 %token <unit Ast.tokendata> ARROW         /* "->"  */
 %token <unit Ast.tokendata> ADD           /* "+"   */
-%token <unit Ast.tokendata> MUL           /* "*"   */
+%token <unit Ast.tokendata> EXTOP         /* "<*"   */
 
 /* Symbolic Tokens */
 %token <unit Ast.tokendata> LPAREN        /* "("   */
@@ -438,6 +438,7 @@ ty_op:
       { TyUnknown }
 
 
+
 ty:
   | ty_arrow
       { $1 }
@@ -451,10 +452,12 @@ ty_arrow:
   | ty_prodext ARROW ty
       { TyArrow($1,$3) }
 
+
+
 ty_prodext:
   | ty_atom
       { $1 }
-  | ty_prodext MUL ty_atom
+  | ty_prodext EXTOP ty_atom
       { TyProdExt($1,$3) }
 
 ty_atom:
@@ -467,9 +470,9 @@ ty_atom:
   | LPAREN ty COMMA ty_list RPAREN
       { TyTuple ($2::$4) }
   | LBRACKET RBRACKET
-      { TyRecord [] }
+      { TyRecord([],us"",[]) }
   | LBRACKET label_tys RBRACKET
-      { TyRecord($2) }
+      { TyRecord([],us"",$2) }
   | type_ident
       {match Ustring.to_utf8 $1.v with
        | "Bool"   -> TyBool

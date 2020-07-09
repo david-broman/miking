@@ -97,9 +97,9 @@ let rec ustring_of_ty = function
     else us"[" ^. ustring_of_ty ty1 ^. us"]"
   | TyTuple tys ->
     us"(" ^. Ustring.concat (us",") (List.map ustring_of_ty tys) ^. us")"
-  | TyRecord tys ->
+  | TyRecord(_,_,tys) ->
     let pprint_ty_label = function
-      | (l, ty) -> l ^. us" : " ^. ustring_of_ty ty in
+      | (l, ty) -> l ^. us":" ^. ustring_of_ty ty in
     us"{" ^. Ustring.concat (us",") (List.map pprint_ty_label tys) ^. us"}"
   | TyCon(s) -> s
   | TyProdExt(ty1,ty2) -> ustring_of_ty ty1 ^. us" * " ^. ustring_of_ty ty2

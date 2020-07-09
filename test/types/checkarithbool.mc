@@ -16,11 +16,11 @@ lang CheckArith = ArithSyntax + TypeSyntax
   | TmLit {ty: Ty}
   | TmAdd {ty: Ty}
 
-  sem getType: all e :: ExtTm * tm. e * ExtTm * tm -> Ty =
+  sem getType: all e :: ExtTm <* tm. e <* ExtTm <* tm -> Ty =
   | TmLit r -> r.ty
   | TmAdd r -> r.ty
 
-  sem typecheck: all e :: ExtTm * Tm. e * tm -> e * ExtTm * tm =
+  sem typecheck: all e :: ExtTm <* Tm. e <* tm -> e <* ExtTm <* tm =
   | TmLit r -> TmLit {r with ty = TyInt{}}
   | TmAdd r ->
     let left2 = typecheck r.left in

@@ -35,6 +35,9 @@ let sym_no = ref 0
 let gensym() = sym_no := !sym_no + 1; !sym_no
 
 
+type con_str = ustring
+type pi_str = ustring
+
 
 
 (* Evaluation environment *)
@@ -194,7 +197,8 @@ and ty =
 | TyArrow   of ty * ty                            (* Function type *)
 | TySeq     of ty                                 (* Sequence type *)
 | TyTuple   of ty list                            (* Tuple type *)
-| TyRecord  of (ustring * ty) list                (* Record type *)
+| TyRecord  of pi_str list * con_str *
+               (ustring * ty) list                (* Record type and record extension*)
 | TyCon     of ustring                            (* Type constructor *)
 | TyProdExt of ty * ty                            (* Product extension *)
 
