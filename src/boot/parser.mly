@@ -435,14 +435,14 @@ ty_op:
   | COLON ty
       { $2 }
   |
-      { TyDyn }
+      { TyUnknown }
 
 
 ty:
   | ty_arrow
       { $1 }
   | ALL var_ident COLONCOLON ty DOT ty
-      { TyDyn (* TEMP - add correct type *) }
+      { TyUnknown (* TEMP - add correct type *) }
 
 
 ty_arrow:
@@ -472,7 +472,6 @@ ty_atom:
       { TyRecord($2) }
   | type_ident
       {match Ustring.to_utf8 $1.v with
-       | "Dyn"    -> TyDyn
        | "Bool"   -> TyBool
        | "Int"    -> TyInt
        | "Float"  -> TyFloat

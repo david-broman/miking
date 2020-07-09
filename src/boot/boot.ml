@@ -151,7 +151,6 @@ let evalprog filename  =
      |> debug_after_mlang
      |> Mexpr.symbolize builtin_name2sym
      |> debug_after_symbolize
-     |> Typecheck.typecheck
      |> Mexpr.eval builtin_sym2term
      |> fun _ -> ())
     with
@@ -204,7 +203,7 @@ let runrepl _ =
   let repl_merge_includes = merge_includes (Sys.getcwd ()) [] in
   (* Wrap the final mexpr in a lambda application to prevent scope leak *)
   let repl_wrap_mexpr (Program(inc, tops, tm)) =
-    let lambda_wrapper = TmLam(NoInfo, us"_", nosym, TyArrow(TyInt,TyDyn), tm) in
+    let lambda_wrapper = TmLam(NoInfo, us"_", nosym, TyArrow(TyInt,TyUnknown), tm) in
     let new_tm = TmApp(NoInfo, lambda_wrapper, TmConst(NoInfo, CInt(0))) in
     Program(inc, tops, new_tm) in
   let rec read_eval_print envs =
@@ -257,9 +256,6 @@ let main =
   let speclist = [
 
     (* First character in description string must be a space for alignment! *)
-    "--type-check", Arg.Set(enable_type_check),
-    " Enables static type checking (experimental).";
-
     "--no-prelude", Arg.Set(no_prelude),
     " Do not load the prelude.";
 

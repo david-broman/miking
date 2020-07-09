@@ -86,7 +86,7 @@ let ustring_of_pat p =
  *  TODO Use Format module printing *)
 let rec ustring_of_ty = function
   | TyUnit  -> us"()"
-  | TyDyn   -> us"Dyn"
+  | TyUnknown   -> us"Unknown"
   | TyBool  -> us"Bool"
   | TyInt   -> us"Int"
   | TyFloat -> us"Float"
@@ -267,6 +267,11 @@ and print_tm fmt (prec, t) =
   else
     fprintf fmt "%a" print_tm' t
 
+and print_ty_if_not_unknown = function
+  | TyUnknown -> ""
+  | ty -> ":" ^ (ty |> ustring_of_ty |> string_of_ustring)
+
+
 (** Auxiliary print function *)
 and print_tm' fmt t = match t with
 
@@ -277,10 +282,9 @@ and print_tm' fmt t = match t with
 
   | TmLam(_,x,_,ty,t1) ->
     let x = string_of_ustring x in
-    let ty = ty |> ustring_of_ty |> string_of_ustring in
-    fprintf fmt "@[<hov %d>lam %s:%s.@ %a@]"
+    fprintf fmt "@[<hov %d>lam %s%s.@ %a@]"
       !ref_indent x
-      ty
+      (print_ty_if_not_unknown ty)
       print_tm (Lam, t1)
 
   | TmLet(_,x,_,t1,t2) ->
@@ -347,9 +351,8 @@ and print_tm' fmt t = match t with
 
   | TmCondef(_,x,s,ty,t) ->
     let str = string_of_ustring (ustring_of_var x s) in
-    let ty = ty |> ustring_of_ty |> string_of_ustring in
-    fprintf fmt "@[<hov 0>con %s:%s in@ %a@]"
-      str ty print_tm (Match, t)
+    fprintf fmt "@[<hov 0>con %s%s in@ %a@]"
+      str (print_ty_if_not_unknown ty) print_tm (Match, t)
 
   | TmConapp(_,x,sym,t) ->
     let str = string_of_ustring (ustring_of_var x sym) in

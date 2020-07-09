@@ -19,7 +19,6 @@ let enable_debug_after_mlang = ref false
 let enable_debug_symbol_print = ref false
 
 (* Other options *)
-let enable_type_check = ref false
 let no_prelude = ref false
 
 let utest = ref false           (* Set to true if unit testing is enabled *)
@@ -187,7 +186,7 @@ and pat =
 (* Types *)
 and ty =
 | TyUnit                                          (* Unit type *)
-| TyDyn                                           (* Dynamic type *)
+| TyUnknown                                       (* Unknown type *)
 | TyBool                                          (* Boolean type *)
 | TyInt                                           (* Int type *)
 | TyFloat                                         (* Floating-point type *)

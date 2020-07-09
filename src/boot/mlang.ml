@@ -333,7 +333,7 @@ let desugar_top (nss, (stack : (tm -> tm) list)) = function
      let inter_to_tm fname fi params cases =
        let target = us"__sem_target" in
        let wrap_param (Param(fi, name, ty)) tm = TmLam(fi, name, nosym, ty, tm)
-       in TmLam(fi, target, nosym, TyDyn, translate_cases fname (var target) cases)
+       in TmLam(fi, target, nosym, TyUnknown, translate_cases fname (var target) cases)
           |> List.fold_right wrap_param params
           |> desugar_tm nss ns in
      let translate_inter = function
