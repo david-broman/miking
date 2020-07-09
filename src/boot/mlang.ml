@@ -185,7 +185,7 @@ let flatten prg: program = snd (flatten_with_env Record.empty prg)
 module AstHelpers = struct
   let var x = TmVar(NoInfo, x, nosym)
   let app l r = TmApp(NoInfo, l, r)
-  let let_ x s e body = TmLet(NoInfo, x, s, e, body)
+  let let_ x s e body = TmLet(NoInfo, x, s, e, TyUnknown, body)
 end
 
 open AstHelpers
@@ -241,11 +241,11 @@ let rec desugar_tm nss env =
   (* Introducing things *)
   | TmLam(fi, name, s, ty, body) ->
      TmLam(fi, empty_mangle name, s, ty, desugar_tm nss (delete_id env name) body)
-  | TmLet(fi, name, s,  e, body) ->
-     TmLet(fi, empty_mangle name, s, desugar_tm nss env e, desugar_tm nss (delete_id env name) body)
+  | TmLet(fi, name, s,  e, ty, body) ->
+     TmLet(fi, empty_mangle name, s, desugar_tm nss env e, ty, desugar_tm nss (delete_id env name) body)
   | TmRecLets(fi, bindings, body) ->
-     let env' = List.fold_left (fun env' (_, name,_, _) -> delete_id env' name) env bindings
-     in TmRecLets(fi, List.map (fun (fi, name, s, e) -> (fi, empty_mangle name, s, desugar_tm nss env' e)) bindings, desugar_tm nss env' body)
+     let env' = List.fold_left (fun env' (_, name,_, _,  _) -> delete_id env' name) env bindings
+     in TmRecLets(fi, List.map (fun (fi, name, s, ty, e) -> (fi, empty_mangle name, s, ty, desugar_tm nss env' e)) bindings, desugar_tm nss env' body)
   | TmCondef(fi, name, s, ty, body) ->
      TmCondef(fi, empty_mangle name, s, ty, desugar_tm nss (delete_con env name) body)
   | TmConapp(fi,x,s,t) -> TmConapp(fi,resolve_con env x,s,desugar_tm nss env t)
@@ -337,7 +337,7 @@ let desugar_top (nss, (stack : (tm -> tm) list)) = function
           |> List.fold_right wrap_param params
           |> desugar_tm nss ns in
      let translate_inter = function
-       | Sem(fi, name, params, cases) -> Some (fi, mangle name, nosym, inter_to_tm name fi params cases)
+       | Sem(fi, name, params, cases) -> Some (fi, mangle name, nosym, TyUnknown, inter_to_tm name fi params cases)
        | _ -> None in
      (* put translated inters in a single letrec, then wrap in cons, then done *)
      let wrap tm = TmRecLets(NoInfo, List.filter_map translate_inter decls, tm)
@@ -345,12 +345,12 @@ let desugar_top (nss, (stack : (tm -> tm) list)) = function
      in (USMap.add langName ns nss, wrap :: stack)
 
   (* The other tops are trivial translations *)
-  | TopLet(Let(fi, id, tm)) ->
-     let wrap tm' = TmLet(fi, empty_mangle id, nosym, desugar_tm nss emptyMlangEnv tm, tm')
+  | TopLet(Let(fi, id, ty, tm)) ->
+     let wrap tm' = TmLet(fi, empty_mangle id, nosym, desugar_tm nss emptyMlangEnv tm, ty, tm')
      in (nss, (wrap :: stack))
   | TopRecLet(RecLet(fi, lets)) ->
-    let wrap tm' = TmRecLets(fi, List.map (fun (fi', id, tm) -> (fi',
-      empty_mangle id, nosym, desugar_tm nss emptyMlangEnv tm)) lets, tm')
+    let wrap tm' = TmRecLets(fi, List.map (fun (fi', id, ty, tm) -> (fi',
+      empty_mangle id, nosym, ty, desugar_tm nss emptyMlangEnv tm)) lets, tm')
      in (nss, (wrap :: stack))
   | TopCon(Con(fi, id, ty)) ->
      let wrap tm' = TmCondef(fi, empty_mangle id, nosym, ty, tm')

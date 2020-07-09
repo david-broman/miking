@@ -147,7 +147,7 @@ top:
 toplet:
   | LET var_ident ty_op EQ mexpr
     { let fi = mkinfo $1.i $4.i in
-      Let (fi, $2.v, $5) }
+      Let (fi, $2.v, $3, $5) }
 
 topRecLet:
   | REC lets END
@@ -254,11 +254,11 @@ mexpr:
       { $6 }
   | REC lets IN mexpr
       { let fi = mkinfo $1.i $3.i in
-        let lst = List.map (fun (fi,x,t) -> (fi,x,0,t)) $2 in
+        let lst = List.map (fun (fi,x,ty,t) -> (fi,x,0,ty,t)) $2 in
          TmRecLets(fi,lst,$4) }
   | LET var_ident ty_op EQ mexpr IN mexpr
       { let fi = mkinfo $1.i $6.i in
-        TmLet(fi,$2.v,0,$5,$7) }
+        TmLet(fi,$2.v,0,$5,$3,$7) }
   | LAM var_ident ty_op DOT mexpr
       { let fi = mkinfo $1.i (tm_info $5) in
         TmLam(fi,$2.v,0,$3,$5) }
@@ -281,10 +281,10 @@ mexpr:
 lets:
   | LET var_ident ty_op EQ mexpr
       { let fi = mkinfo $1.i (tm_info $5) in
-        [(fi, $2.v, $5)] }
+        [(fi, $2.v, $3, $5)] }
   | LET var_ident ty_op EQ mexpr lets
       { let fi = mkinfo $1.i (tm_info $5) in
-        (fi, $2.v, $5)::$6 }
+        (fi, $2.v, $3, $5)::$6 }
 
 
 left:

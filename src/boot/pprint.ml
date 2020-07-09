@@ -287,21 +287,24 @@ and print_tm' fmt t = match t with
       (print_ty_if_not_unknown ty)
       print_tm (Lam, t1)
 
-  | TmLet(_,x,_,t1,t2) ->
+  | TmLet(_,x,_,t1,ty,t2) ->
     let x = string_of_ustring x in
     fprintf fmt "@[<hov 0>\
-                   @[<hov %d>let %s =@ %a in@]\
+                   @[<hov %d>let %s%s =@ %a in@]\
                    @ %a\
                  @]"
       !ref_indent x
+      (print_ty_if_not_unknown ty)
       print_tm (Match, t1)
       print_tm (Match, t2)
 
   | TmRecLets(_,lst,t2) ->
-    let print (_,x,_,t) =
+    let print (_,x,_,ty,t) =
       let x = string_of_ustring x in
-      (fun fmt -> fprintf fmt "@[<hov %d>let %s =@ %a@]"
-          !ref_indent x print_tm (Match,t)) in
+      (fun fmt -> fprintf fmt "@[<hov %d>let %s%s =@ %a@]"
+        !ref_indent x
+        (print_ty_if_not_unknown ty)
+        print_tm (Match,t)) in
     let inner = List.map print lst in
     fprintf fmt "@[<hov 0>\
                    @[<hov %d>recursive@ @[<hov 0>%a@] in@]\

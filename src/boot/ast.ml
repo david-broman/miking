@@ -124,8 +124,8 @@ and decl =
 | Sem of info * ustring * param list * (pat * tm) list
 
 and mlang   = Lang of info * ustring * ustring list * decl list
-and let_decl = Let of info * ustring * tm
-and rec_let_decl = RecLet of info * (info * ustring * tm) list
+and let_decl = Let of info * ustring * ty * tm
+and rec_let_decl = RecLet of info * (info * ustring * ty * tm) list
 and con_decl = Con of info * ustring * ty
 and top =
 | TopLang   of mlang
@@ -140,8 +140,8 @@ and program = Program of include_ list * top list * tm
 and tm =
 | TmVar     of info * ustring * sym                                 (* Variable *)
 | TmLam     of info * ustring * sym * ty * tm                       (* Lambda abstraction *)
-| TmLet     of info * ustring * sym * tm * tm                       (* Let *)
-| TmRecLets of info * (info * ustring * sym * tm) list * tm         (* Recursive lets *)
+| TmLet     of info * ustring * sym * tm * ty * tm                  (* Let *)
+| TmRecLets of info * (info * ustring * sym * ty * tm) list * tm    (* Recursive lets *)
 | TmApp     of info * tm * tm                                       (* Application *)
 | TmConst   of info * const                                         (* Constant *)
 | TmSeq     of info * tm Mseq.t                                     (* Sequence *)
@@ -219,9 +219,9 @@ let rec map_tm f = function
   | TmVar (_,_,_) as t -> f t
   | TmLam(fi,x,s,ty,t1) -> f (TmLam(fi,x,s,ty,map_tm f t1))
   | TmClos(fi,x,s,ty,t1,env) -> f (TmClos(fi,x,s,ty,map_tm f t1,env))
-  | TmLet(fi,x,s,t1,t2) -> f (TmLet(fi,x,s,map_tm f t1,map_tm f t2))
+  | TmLet(fi,x,s,t1,ty,t2) -> f (TmLet(fi,x,s,map_tm f t1,ty,map_tm f t2))
   | TmRecLets(fi,lst,tm) ->
-     f (TmRecLets(fi,List.map (fun (fi,x,s,t) -> (fi,x,s,map_tm f t)) lst, map_tm f tm))
+     f (TmRecLets(fi,List.map (fun (fi,x,s,ty,t) -> (fi,x,s,ty,map_tm f t)) lst, map_tm f tm))
   | TmApp(fi,t1,t2) -> f (TmApp(fi,map_tm f t1,map_tm f t2))
   | TmConst(_,_) as t -> f t
   | TmFix(_) as t -> f t
@@ -242,7 +242,7 @@ let tm_info = function
   | TmVar(fi,_,_) -> fi
   | TmLam(fi,_,_,_,_) -> fi
   | TmClos(fi,_,_,_,_,_) -> fi
-  | TmLet(fi,_,_,_,_) -> fi
+  | TmLet(fi,_,_,_,_,_) -> fi
   | TmRecLets(fi,_,_) -> fi
   | TmApp(fi,_,_) -> fi
   | TmConst(fi,_) -> fi

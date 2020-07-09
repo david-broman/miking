@@ -509,10 +509,10 @@ let rec symbolize (env : (ident * sym) list) (t : tm) =
   | TmVar(fi,x,_) -> TmVar(fi,x,findsym fi (IdVar(sid_of_ustring x)) env)
   | TmLam(fi,x,_,ty,t1) -> let s = gensym() in TmLam(fi,x,s,ty,symbolize ((IdVar(sid_of_ustring x),s)::env) t1)
   | TmClos(_,_,_,_,_,_) -> failwith "Closures should not be available."
-  | TmLet(fi,x,_,t1,t2) -> let s = gensym() in TmLet(fi,x,s,symbolize env t1,symbolize ((IdVar(sid_of_ustring x),s)::env) t2)
+  | TmLet(fi,x,_,t1,ty,t2) -> let s = gensym() in TmLet(fi,x,s,symbolize env t1,ty,symbolize ((IdVar(sid_of_ustring x),s)::env) t2)
   | TmRecLets(fi,lst,tm) ->
-     let env2 = List.fold_left (fun env (_,x,_,_) -> let s = gensym() in (IdVar(sid_of_ustring x),s)::env) env lst in
-     TmRecLets(fi,List.map (fun (fi,x,_,t) -> (fi,x,findsym fi (IdVar(sid_of_ustring x)) env2, symbolize env2 t))
+     let env2 = List.fold_left (fun env (_,x,_,_,_) -> let s = gensym() in (IdVar(sid_of_ustring x),s)::env) env lst in
+     TmRecLets(fi,List.map (fun (fi,x,_,ty,t) -> (fi,x,findsym fi (IdVar(sid_of_ustring x)) env2, ty, symbolize env2 t))
        lst, symbolize env2 tm)
   | TmApp(fi,t1,t2) -> TmApp(fi,symbolize env t1,symbolize env t2)
   | TmConst(_,_) -> t
@@ -533,14 +533,14 @@ let rec symbolize (env : (ident * sym) list) (t : tm) =
 (* Same as symbolize, but records all toplevel definitions and returns them
  along with the symbolized term *)
 let rec symbolize_toplevel (env : (ident * sym) list) = function
-  | TmLet(fi,x,_,t1,t2) ->
+  | TmLet(fi,x,_,t1,ty,t2) ->
     let s = gensym() in
     let (new_env, new_t2) = symbolize_toplevel ((IdVar(sid_of_ustring x),s)::env) t2 in
-    (new_env, TmLet(fi,x,s,symbolize env t1,new_t2))
+    (new_env, TmLet(fi,x,s,symbolize env t1,ty,new_t2))
   | TmRecLets(fi,lst,tm) ->
-    let env2 = List.fold_left (fun env (_,x,_,_) -> let s = gensym() in (IdVar(sid_of_ustring x),s)::env) env lst in
+    let env2 = List.fold_left (fun env (_,x,_,_,_) -> let s = gensym() in (IdVar(sid_of_ustring x),s)::env) env lst in
     let (new_env, new_tm) = symbolize_toplevel env2 tm in
-    (new_env, TmRecLets(fi,List.map (fun (fi,x,_,t) -> (fi,x,findsym fi (IdVar(sid_of_ustring x)) env2, symbolize env2 t))
+    (new_env, TmRecLets(fi,List.map (fun (fi,x,_,ty,t) -> (fi,x,findsym fi (IdVar(sid_of_ustring x)) env2, ty, symbolize env2 t))
        lst, new_tm))
   | TmCondef(fi,x,_,ty,t) ->
     let s = gensym() in
@@ -627,14 +627,14 @@ let rec eval (env : (sym * tm) list) (t : tm) =
   | TmLam(fi,x,s,ty,t1) -> TmClos(fi,x,s,ty,t1,lazy env)
   | TmClos(_,_,_,_,_,_) -> t
   (* Let *)
-  | TmLet(_,_,s,t1,t2) -> eval ((s,eval env t1)::env) t2
+  | TmLet(_,_,s,t1,_,t2) -> eval ((s,eval env t1)::env) t2
   (* Recursive lets *)
   | TmRecLets(_,lst,t2) ->
      let rec env' = lazy
        (let wraplambda = function
           | TmLam(fi,x,s,ty,t1) -> TmClos(fi,x,s,ty,t1,env')
           | tm -> raise_error (tm_info tm) "Right-hand side of recursive let must be a lambda"
-        in List.fold_left (fun env (_, _, s, rhs) -> (s, wraplambda rhs) :: env) env lst)
+        in List.fold_left (fun env (_, _, s, _, rhs) -> (s, wraplambda rhs) :: env) env lst)
      in eval (Lazy.force env') (t2)
   (* Application *)
   | TmApp(fiapp,t1,t2) ->
@@ -689,13 +689,13 @@ let rec eval (env : (sym * tm) list) (t : tm) =
 (* Same as eval, but records all toplevel definitions and returns them along
   with the evaluated result *)
 let rec eval_toplevel (env : (sym * tm) list) = function
-  | TmLet(_,_,s,t1,t2) -> eval_toplevel ((s,eval env t1)::env) t2
+  | TmLet(_,_,s,t1,_,t2) -> eval_toplevel ((s,eval env t1)::env) t2
   | TmRecLets(_,lst,t2) ->
      let rec env' = lazy
        (let wraplambda = function
           | TmLam(fi,x,s,ty,t1) -> TmClos(fi,x,s,ty,t1,env')
           | tm -> raise_error (tm_info tm) "Right-hand side of recursive let must be a lambda"
-        in List.fold_left (fun env (_, _, s, rhs) -> (s, wraplambda rhs) :: env) env lst)
+        in List.fold_left (fun env (_, _, s, _, rhs) -> (s, wraplambda rhs) :: env) env lst)
      in eval_toplevel (Lazy.force env') t2
   | TmCondef(_,_,_,_,t) -> eval_toplevel env t
   | t -> (env, eval env t)
