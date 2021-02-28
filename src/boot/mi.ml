@@ -13,6 +13,7 @@ open Boot.Ast
 open Boot.Eval
 open Boot.Repl
 open Boot.Mexpr
+open Boot.Typechecker
 
 (* Define the file slash, to make it platform independent *)
 let sl = if Sys.win32 then "\\" else "/"
@@ -87,6 +88,9 @@ let main =
       , Arg.Set enable_debug_symbol_print
       , " Enables output of symbols for variables. Affects all other debug \
          printing." )
+    ; ( "--typecheck"
+      , Arg.Set enable_typecheck
+      , " Enables type checking." )
     ; ( "--full-pattern"
       , Arg.Set Boot.Patterns.pat_example_gives_complete_pattern
       , " Make the pattern analysis in mlang print full patterns instead of \

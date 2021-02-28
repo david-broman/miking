@@ -42,6 +42,7 @@ let evalprog filename =
       |> merge_includes (Filename.dirname filename) [filename]
       |> Mlang.flatten |> Mlang.desugar_post_flatten |> debug_after_mlang
       |> Mexpr.symbolize builtin_name2sym
+      |> Typechecker.typecheck
       |> debug_after_symbolize
       |> Mexpr.eval builtin_sym2term
       |> fun _ -> ()
