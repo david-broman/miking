@@ -15,6 +15,214 @@ open Ustring.Op
  * - The input is flattened, and the output rope (if any) is flat, which we
  *   write as "flattens".
  *)
+
+
+(* Sequences using conscat lists - combines cons lists with efficient concatenation.
+   Some legacy functions (e.g. is_rope) is kept for compatibility *)
+
+module MyMseq : sig
+  type 'a t
+
+  val create : int -> (int -> 'a) -> 'a t
+
+  val create_rope : int -> (int -> 'a) -> 'a t
+
+  val create_list : int -> (int -> 'a) -> 'a t
+
+  val is_rope : 'a t -> bool
+
+  val is_list : 'a t -> bool
+
+  val empty : 'a t
+
+  val empty_rope : 'a t
+
+  val empty_list : 'a t
+
+  val length : 'a t -> int
+
+  val is_length_at_least : 'a t -> int -> bool
+
+  val concat : 'a t -> 'a t -> 'a t
+
+  val get : 'a t -> int -> 'a
+
+(*
+  (* Complexity:
+   * rope (?): O(n), where n is the length of the sequence
+   * list (?): O(m), where m is the int
+   *)
+  val set : 'a t -> int -> 'a -> 'a t
+
+  (* Complexity:
+   * rope (?): O(1)
+   * list: O(1)
+   *)
+  val cons : 'a -> 'a t -> 'a t
+
+  (* Complexity:
+   * rope (?): O(1)
+   * list (?): O(n), where n is the length of the sequence
+   *)
+  val snoc : 'a t -> 'a -> 'a t
+
+  (* Complexity:
+   * rope (?): O(n), where n is the length of the sequence (flattens)
+   * list (?): O(n), where n is the length of the sequence
+   *)
+  val reverse : 'a t -> 'a t
+
+  (* Complexity:
+   * rope (?): O(h), see `get`
+   * list: O(1)
+   *)
+  val head : 'a t -> 'a
+
+  (* Complexity:
+   * rope (?): O(1), if rope is flat, otherwise O(n) (flattens)
+   * list: O(1)
+   *)
+  val tail : 'a t -> 'a t
+
+  (* Complexity:
+   * rope (?): O(1)
+   * list: O(1)
+   *)
+  val null : 'a t -> bool
+
+  (* Complexity:
+   * rope (?): O(n*k), where n is the length of the sequence and k is the
+   *   complexity of the function
+   * list: O(n*k), where n is the length of the sequence and k is the complexity
+   *   of the function
+   *)
+  val iter : ('a -> unit) -> 'a t -> unit
+
+  (* Complexity:
+   * rope (?): O(n*k), where n is the length of the sequence and k is the
+   *   complexity of the function
+   * list: O(n*k), where n is the length of the sequence and k is the complexity
+   *   of the function
+   *)
+  val iteri : (int -> 'a -> unit) -> 'a t -> unit
+
+  (* Complexity:
+   * rope (?): O(1), if the rope is flat, otherwise O(n) (flattens)
+   * list (?): O(m), where m is the int
+   *)
+  val split_at : 'a t -> int -> 'a t * 'a t
+
+  (* Complexity:
+   * rope (?): O(1), if the rope is flat, otherwise O(n) (flattens)
+   * list (?): O(k + m), where k and m are the int inputs
+   *)
+  val subsequence : 'a t -> int -> int -> 'a t
+
+  (* Complexity:
+   * rope (?): O(n*k), where n is the length of the sequence, k is the
+   *   complexity of the function (flattens)
+   * list (?): O(n*k), where n is the length of the sequence, k is the
+   *   complexity of the function
+   *)
+  val map : ('a -> 'b) -> 'a t -> 'b t
+
+  (* Complexity:
+   * rope (?): O(n*k), where n is the length of the sequence, k is the
+   *   complexity of the function (flattens)
+   * list (?): O(n*k), where n is the length of the sequence, k is the
+   *   complexity of the function
+   *)
+  val mapi : (int -> 'a -> 'b) -> 'a t -> 'b t
+
+  module Helpers : sig
+    val to_seq : 'a t -> 'a Seq.t
+
+    val of_list : 'a list -> 'a t
+
+    val of_list_list : 'a list -> 'a t
+
+    val of_list_rope : 'a list -> 'a t
+
+    val to_list : 'a t -> 'a list
+
+    val of_array : 'a array -> 'a t
+
+    val of_array_copy : 'a array -> 'a t
+
+    val of_array_list : 'a array -> 'a t
+
+    val of_array_rope : 'a array -> 'a t
+
+    val to_array : 'a t -> 'a array
+
+    val to_array_copy : 'a t -> 'a array
+
+    val of_ustring : ustring -> int t
+
+    val of_ustring_rope : ustring -> int t
+
+    val of_ustring_list : ustring -> int t
+
+    val to_ustring : int t -> ustring
+
+    val to_utf8 : int t -> string
+
+    val of_utf8 : string -> int t
+
+    (* Complexity:
+     * rope (?): O(n*k), where n is the length of the sequence, k is the
+     *   complexity of the function (flattens)
+     * list (?): O(n*k), where n is the length of the sequence, k is the
+     *   complexity of the function
+     *)
+    val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
+
+    (* Complexity:
+     * rope (?): O(n*k), where n is the length of the sequence, k is the
+     *   complexity of the function (flattens)
+     * list (?): O(n*k), where n is the length of the sequence, k is the
+     *   complexity of the function
+     *)
+    val fold_left : ('acc -> 'a -> 'acc) -> 'acc -> 'a t -> 'acc
+
+    (* Complexity:
+     * rope (?): O(n*k), where n is the length of the sequence, k is the
+     *   complexity of the function (flattens)
+     * list (?): O(n*k), where n is the length of the sequence, k is the
+     *    complexity of the function
+     *)
+    val fold_right : ('a -> 'acc -> 'acc) -> 'acc -> 'a t -> 'acc
+
+    (* Crashes if the two input sequences have different lengths.
+     * Complexity:
+     * rope (?): O(n), where n is the length of the sequences (flattens)
+     * list (?): O(n), where n is the length of the sequences
+     *)
+    val combine : 'a t -> 'b t -> ('a * 'b) t
+
+    (* Crashes if the two input sequences have different lengths.
+     * Complexity:
+     * rope (?): O(n*k), where n is the length of the sequence, k is the
+     *   complexity of the function (flattens)
+     * list (?): O(n*k), where n is the length of the sequence, k is the
+     *   complexity of the function
+     *)
+    val fold_right2 :
+      ('a -> 'b -> 'acc -> 'acc) -> 'a t -> 'b t -> 'acc -> 'acc
+
+    (* Complexity:
+     * rope (?): O(n*k), where n is the length of the sequence, k is the
+     *   complexity of the function (flattens)
+     * list (?): O(n*k), where n is the length of the sequence, k is the
+     *   complexity of the function
+     *)
+    val map_accum_left :
+      ('acc -> 'a -> 'acc * 'b) -> 'acc -> 'a t -> 'acc * 'b t
+  end
+ *)
+
+end
+
 module Mseq : sig
   type 'a t = List of 'a List.t | Rope of 'a Rope.t
 

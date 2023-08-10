@@ -51,7 +51,7 @@ let testprog lst =
 let runrepl _ = start_repl ()
 
 (* Print out main menu *)
-let usage_msg = "Usage: boot [eval|repl] <files>\n\nOptions:"
+let usage_msg = "Usage: boot [eval|repl|tests] <files>\n\nOptions:"
 
 (* Main function. Checks arguments and reads file names *)
 let main =
@@ -139,6 +139,9 @@ let main =
     (* Eval one program with program arguments without typechecking *)
     | "eval" :: (name :: _ as lst) ->
         if !utest then testprog lst else evalprog name
+    (* Run unit tests for boot itself *)
+    | "tests" :: _ ->
+        Boot.Tests.run_tests ()
     (* Show the menu *)
     | _ ->
         Arg.usage speclist usage_msg

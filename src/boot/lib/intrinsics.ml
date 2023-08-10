@@ -1,5 +1,75 @@
 open Ustring.Op
 
+module MyMseq = struct
+  type 'a t = Nil | Cons of 'a * 'a t | Branch of 'a t * 'a t
+
+  let create n f =
+    let rec work k acc =
+      if k == 0 then acc else
+        let k' = k - 1 in
+        work k' (Cons(f k', acc))
+    in
+      work n Nil
+
+  let empty = Nil
+
+  let create_rope = create
+
+  let create_list = create
+
+  let is_rope _ = true
+
+  let is_list _ = true
+
+  let empty_rope = empty
+
+  let empty_list = empty
+
+  let length s =
+    let rec work acc = function
+      | Nil -> acc
+      | Cons(_,xs) -> work (acc+1) xs
+      | Branch(x, y) -> work (work acc x) y
+    in
+    work 0 s
+
+
+  let is_length_at_least s i =
+    let rec work acc = function
+      | Nil -> acc
+      | Cons(_,xs) -> if acc >= i then acc else work (acc+1) xs
+      | Branch(xs, ys) -> if acc >= i then acc else
+                          let k = work acc xs in
+                          if k >= i then k else
+                          work k ys
+    in
+    work 0 s >= i
+
+  let concat s1 s2 =
+    Branch(s1, s2)
+
+  let get s n =
+    let rec work k = function
+      | Nil -> (None, k)
+      | Cons(x,xs) ->
+         if k >= n then (Some x,k) else work (k+1) xs
+      | Branch(xs, ys) ->
+         let (x_op, k') = work k xs in
+         if k' > n then (x_op, k') else work k' ys
+    in
+    (match work 0 s with
+     | (None, _) -> failwith "Out of bound"
+     | (Some x,_) -> x)
+
+
+
+end
+
+(* OLD SEQ *)
+
+let do_print = false
+let my_prn s = if do_print then Printf.printf "** %s\n" s else ()
+
 module Mseq = struct
   type 'a t = List of 'a List.t | Rope of 'a Rope.t
 
@@ -42,6 +112,7 @@ module Mseq = struct
         work i s
 
   let concat s1 s2 =
+    my_prn "concat";
     match (s1, s2) with
     | Rope s1, Rope s2 ->
         Rope (Rope.concat_array s1 s2)
@@ -52,7 +123,9 @@ module Mseq = struct
     | Rope s1, List s2 ->
         List (Rope.foldr_array List.cons s1 s2)
 
-  let get s = match s with Rope s -> Rope.get_array s | List s -> List.nth s
+  let get s =
+    my_prn "get";
+    match s with Rope s -> Rope.get_array s | List s -> List.nth s
 
   let set s i v =
     match s with
@@ -105,14 +178,18 @@ module Mseq = struct
 
   let iter f = function
     | Rope s ->
+        my_prn "iter (Rope)";
         Rope.iter_array f s
     | List s ->
+        my_prn "iter (List)";
         List.iter f s
 
   let iteri f = function
     | Rope s ->
+        my_prn "iteri (Rope)";
         Rope.iteri_array f s
     | List s ->
+        my_prn "iteri (List)";
         List.iteri f s
 
   let split_at s i =
@@ -148,14 +225,18 @@ module Mseq = struct
 
   let map f = function
     | Rope s ->
+        my_prn "map (Rope)";
         Rope (Rope.map_array_array f s)
     | List s ->
+        my_prn "map (List)";
         List (List.map f s)
 
   let mapi f = function
     | Rope s ->
+        my_prn "mapi (Rope)";
         Rope (Rope.mapi_array_array f s)
     | List s ->
+        my_prn "mapi (List)";
         List (List.mapi f s)
 
   module Helpers = struct
@@ -284,6 +365,8 @@ module Mseq = struct
     let of_utf8 s = Ustring.from_utf8 s |> of_ustring
   end
 end
+
+
 
 module T = struct
   open Bigarray
