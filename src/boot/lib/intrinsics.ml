@@ -88,6 +88,30 @@ module MyMseq = struct
             Value (Branch (xs', ys)) )
     in
     match work s 0 with Value v -> v | _ -> failwith "set: out of bound"
+
+  let cons x xs = Cons (x, xs)
+
+  (* Not tail recursive *)
+  let rec snoc s v =
+    match s with
+    | Nil ->
+        Cons (v, Nil)
+    | Cons (x, xs) ->
+        Cons (x, snoc xs v)
+    | Branch (xs, ys) ->
+        Branch (xs, snoc ys v)
+
+  let reverse s =
+    let rec work s acc =
+      match s with
+      | Nil ->
+          acc
+      | Cons (x, xs) ->
+          work xs (Cons (x, acc))
+      | Branch (xs, ys) ->
+          work ys (work xs acc)
+    in
+    work s Nil
 end
 
 (* OLD SEQ *)

@@ -48,24 +48,17 @@ module MyMseq : sig
 
   val set : 'a t -> int -> 'a -> 'a t
 
+  val cons : 'a -> 'a t -> 'a t
+
+  val snoc : 'a t -> 'a -> 'a t
+
+  val reverse : 'a t -> 'a t
+
   (*
   (* Complexity:
    * rope (?): O(1)
    * list: O(1)
    *)
-  val cons : 'a -> 'a t -> 'a t
-
-  (* Complexity:
-   * rope (?): O(1)
-   * list (?): O(n), where n is the length of the sequence
-   *)
-  val snoc : 'a t -> 'a -> 'a t
-
-  (* Complexity:
-   * rope (?): O(n), where n is the length of the sequence (flattens)
-   * list (?): O(n), where n is the length of the sequence
-   *)
-  val reverse : 'a t -> 'a t
 
   (* Complexity:
    * rope (?): O(h), see `get`
