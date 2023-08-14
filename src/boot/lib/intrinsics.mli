@@ -16,7 +16,6 @@ open Ustring.Op
  *   write as "flattens".
  *)
 
-
 (* Sequences using conscat lists - combines cons lists with efficient concatenation.
    Some legacy functions (e.g. is_rope) is kept for compatibility *)
 
@@ -47,13 +46,9 @@ module MyMseq : sig
 
   val get : 'a t -> int -> 'a
 
-(*
-  (* Complexity:
-   * rope (?): O(n), where n is the length of the sequence
-   * list (?): O(m), where m is the int
-   *)
   val set : 'a t -> int -> 'a -> 'a t
 
+  (*
   (* Complexity:
    * rope (?): O(1)
    * list: O(1)
@@ -219,8 +214,7 @@ module MyMseq : sig
     val map_accum_left :
       ('acc -> 'a -> 'acc * 'b) -> 'acc -> 'a t -> 'acc * 'b t
   end
- *)
-
+   *)
 end
 
 module Mseq : sig
