@@ -53,7 +53,13 @@ module MyMseq = struct
     in
     work 0 s >= i
 
-  let concat s1 s2 = Branch (s1, s2)
+  (* Important invariant. Branches must never have Nil as
+     their direct children *)
+  let concat s1 s2 =
+    match s1, s2 with
+    | Nil, s2 -> s2
+    | s1, Nil -> s1
+    | _ -> Branch (s1, s2)
 
   let get s n =
     let rec work k = function
@@ -112,6 +118,20 @@ module MyMseq = struct
           work ys (work xs acc)
     in
     work s Nil
+
+  let rec head = function
+    | Nil -> failwith "head on empty sequence"
+    | Cons(x,_) -> x
+    | Branch(xs,_) -> head xs
+
+  let rec tail = function
+    | Nil -> failwith "tail of empty sequence"
+    | Cons(_, xs) -> xs
+    | Branch(xs, ys) ->
+       (match tail xs with
+        | Nil -> ys (* maintain invariant *)
+        | xs' -> Branch(xs', ys))
+
 end
 
 (* OLD SEQ *)

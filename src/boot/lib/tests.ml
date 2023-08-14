@@ -31,6 +31,7 @@ let test_mseq () =
   utest "MyMseq.concat #2" true (check_seq s2 s2_real) ;
   (* empty *)
   let s3 = MyMseq.concat s2 MyMseq.empty in
+  let s3_real = s2_real in
   utest "MyMseq.empty" (MyMseq.length s3) 12 ;
   (* get *)
   utest "MyMseq.get #1" (MyMseq.get s1 1) 1 ;
@@ -56,7 +57,23 @@ let test_mseq () =
     (check_seq (MyMseq.snoc s4 77) (List.rev (77 :: List.rev s4_real))) ;
   (* reverse *)
   utest "MyMSeq.reverse" true
-    (check_seq (MyMseq.reverse s4) (List.rev s4_real))
+    (check_seq (MyMseq.reverse s4) (List.rev s4_real));
+  (* head *)
+  utest "MyMSeq.head" (MyMseq.head s1) (List.hd s1_real);
+  utest "MyMSeq.head" (MyMseq.head s2) (List.hd s2_real);
+  utest "MyMSeq.head" (MyMseq.head s3) (List.hd s3_real);
+  utest "MyMSeq.head" (MyMseq.head s4) (List.hd s4_real);
+  (* tail *)
+  utest "MyMSeq.tail" true
+    (check_seq (MyMseq.tail s1) (List.tl s1_real));
+  utest "MyMSeq.tail" true
+    (check_seq (MyMseq.tail s2) (List.tl s2_real));
+  utest "MyMSeq.tail" true
+    (check_seq (MyMseq.tail s3) (List.tl s3_real));
+  utest "MyMSeq.tail" true
+    (check_seq (MyMseq.tail s4) (List.tl s4_real));
+  ()
+
 
 let run_tests () =
   test_mseq () ;

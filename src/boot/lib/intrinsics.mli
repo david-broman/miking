@@ -54,24 +54,11 @@ module MyMseq : sig
 
   val reverse : 'a t -> 'a t
 
-  (*
-  (* Complexity:
-   * rope (?): O(1)
-   * list: O(1)
-   *)
-
-  (* Complexity:
-   * rope (?): O(h), see `get`
-   * list: O(1)
-   *)
   val head : 'a t -> 'a
 
-  (* Complexity:
-   * rope (?): O(1), if rope is flat, otherwise O(n) (flattens)
-   * list: O(1)
-   *)
   val tail : 'a t -> 'a t
 
+(*
   (* Complexity:
    * rope (?): O(1)
    * list: O(1)
