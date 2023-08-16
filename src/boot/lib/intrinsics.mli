@@ -62,15 +62,9 @@ module MyMseq : sig
 
   val iter : ('a -> unit) -> 'a t -> unit
 
-  (*
-  (* Complexity:
-   * rope (?): O(n*k), where n is the length of the sequence and k is the
-   *   complexity of the function
-   * list: O(n*k), where n is the length of the sequence and k is the complexity
-   *   of the function
-   *)
   val iteri : (int -> 'a -> unit) -> 'a t -> unit
 
+  (*
   (* Complexity:
    * rope (?): O(1), if the rope is flat, otherwise O(n) (flattens)
    * list (?): O(m), where m is the int

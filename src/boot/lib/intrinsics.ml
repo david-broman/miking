@@ -145,6 +145,13 @@ module MyMseq = struct
     in
     work lst
 
+  let iteri f lst =
+    let rec work i = function
+      | Nil -> i
+      | Cons(x, xs) -> f i x; work (i+1) xs
+      | Branch(xs, ys) ->  work (work i xs) ys
+    in
+    let _ = work 0 lst in ()
 
 end
 

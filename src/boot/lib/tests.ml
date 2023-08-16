@@ -79,6 +79,15 @@ let test_mseq () =
   let l = ref [] in
   MyMseq.iter (fun x -> l := x::!l) s4;
   utest "MyMSeq.iter" ((List.rev !l) = s4_real) true;
+  (* Iteri *)
+  l := [];
+  let k = ref [] in
+  MyMseq.iteri (fun i x -> l := x::!l; k := i::!k) s4;
+  utest "MyMSeq.iteri #1" ((List.rev !l) = s4_real) true;
+  let k_real = List.init (List.length s4_real) (fun x -> x) in
+  utest "MyMSeq.iteri #2" ((List.rev !k) = k_real) true;
+
+
   (* The end *)
   ()
 
