@@ -64,13 +64,9 @@ module MyMseq : sig
 
   val iteri : (int -> 'a -> unit) -> 'a t -> unit
 
-  (*
-  (* Complexity:
-   * rope (?): O(1), if the rope is flat, otherwise O(n) (flattens)
-   * list (?): O(m), where m is the int
-   *)
   val split_at : 'a t -> int -> 'a t * 'a t
 
+  (*
   (* Complexity:
    * rope (?): O(1), if the rope is flat, otherwise O(n) (flattens)
    * list (?): O(k + m), where k and m are the int inputs

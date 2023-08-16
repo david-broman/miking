@@ -153,6 +153,21 @@ module MyMseq = struct
     in
     let _ = work 0 lst in ()
 
+  let split_at s i =
+    let rec work l r k = function
+      | Nil -> (l, r, k)
+      | Cons(x, xs) ->
+         if k < i then work (Cons(x,l)) r (k+1) xs
+         else work l (Cons(x,r)) (k+1) xs
+      | Branch(xs, ys) ->
+         let (l', r', k') = work l r k xs in
+         work l' r' k' ys
+    in
+    let (l, r, _) = work Nil Nil 0 s in
+    (reverse l, reverse r)
+
+
+  
 end
 
 (* OLD SEQ *)

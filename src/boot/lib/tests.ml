@@ -7,16 +7,28 @@ let utest str l r =
     printf "\nERROR: test '%s' failed\n" str ;
     exit 1 )
 
-let test_mseq () =
-  let check_seq s seq =
+let check_seq s seq =
     let rec work k = function
       | x :: xs ->
           if MyMseq.get s k = x then work (k + 1) xs else false
       | [] ->
-          true
+         true
     in
     work 0 seq
-  in
+
+let print_seq s = MyMseq.iter (printf "%d, ") s; printf "\n\n"
+let print_list s = List.iter (printf "%d, ") s; printf "\n\n"
+let my_sublist lst a n =
+  let (_, lst') =
+      List.fold_left
+        (fun (i,acc) x -> if i < a || i >= a + n
+                          then (i+1, acc) else (i+1, x::acc)) (0, []) lst
+    in
+    List.rev lst'
+
+
+
+let test_mseq () =
   printf "Testing MSeq: " ;
   (* create, length and is_length_at_least *)
   let s1 = MyMseq.create 10 (fun k -> k) in
@@ -72,21 +84,27 @@ let test_mseq () =
     (check_seq (MyMseq.tail s3) (List.tl s3_real));
   utest "MyMSeq.tail" true
     (check_seq (MyMseq.tail s4) (List.tl s4_real));
-  (* Null *)
+  (* null *)
   utest "MyMSeq.null #1" (MyMseq.null s4) false;
   utest "MyMSeq.null #2" (MyMseq.null MyMseq.empty) true;
-  (* Iter *)
+  (* iter *)
   let l = ref [] in
   MyMseq.iter (fun x -> l := x::!l) s4;
   utest "MyMSeq.iter" ((List.rev !l) = s4_real) true;
-  (* Iteri *)
+  (* iteri *)
   l := [];
   let k = ref [] in
   MyMseq.iteri (fun i x -> l := x::!l; k := i::!k) s4;
   utest "MyMSeq.iteri #1" ((List.rev !l) = s4_real) true;
   let k_real = List.init (List.length s4_real) (fun x -> x) in
   utest "MyMSeq.iteri #2" ((List.rev !k) = k_real) true;
-
+  (* split_at *)
+  let x_split = 14 in
+  let s4_real_a = my_sublist s4_real 0 x_split in
+  let s4_real_b = my_sublist s4_real x_split (List.length s4_real - x_split) in
+  let (s4_a, s4_b) = MyMseq.split_at s4 x_split in
+  utest "MyMSeq.split_at #1" true (check_seq s4_a s4_real_a);
+  utest "MyMSeq.split_at #2" true (check_seq s4_b s4_real_b);
 
   (* The end *)
   ()
