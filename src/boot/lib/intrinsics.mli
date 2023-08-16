@@ -58,21 +58,11 @@ module MyMseq : sig
 
   val tail : 'a t -> 'a t
 
-(*
-  (* Complexity:
-   * rope (?): O(1)
-   * list: O(1)
-   *)
   val null : 'a t -> bool
 
-  (* Complexity:
-   * rope (?): O(n*k), where n is the length of the sequence and k is the
-   *   complexity of the function
-   * list: O(n*k), where n is the length of the sequence and k is the complexity
-   *   of the function
-   *)
   val iter : ('a -> unit) -> 'a t -> unit
 
+  (*
   (* Complexity:
    * rope (?): O(n*k), where n is the length of the sequence and k is the
    *   complexity of the function

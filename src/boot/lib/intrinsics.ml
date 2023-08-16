@@ -124,6 +124,7 @@ module MyMseq = struct
     | Cons(x,_) -> x
     | Branch(xs,_) -> head xs
 
+  (* Not transforming into cons list. Should it *)
   let rec tail = function
     | Nil -> failwith "tail of empty sequence"
     | Cons(_, xs) -> xs
@@ -131,6 +132,19 @@ module MyMseq = struct
        (match tail xs with
         | Nil -> ys (* maintain invariant *)
         | xs' -> Branch(xs', ys))
+
+  let null = function
+    | Nil -> true
+    | _ -> false
+
+  let iter f lst =
+    let rec work = function
+      | Nil -> ()
+      | Cons(x, xs) -> f x; work xs
+      | Branch(xs, ys) -> work xs; work ys
+    in
+    work lst
+
 
 end
 

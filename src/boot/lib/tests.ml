@@ -72,8 +72,15 @@ let test_mseq () =
     (check_seq (MyMseq.tail s3) (List.tl s3_real));
   utest "MyMSeq.tail" true
     (check_seq (MyMseq.tail s4) (List.tl s4_real));
+  (* Null *)
+  utest "MyMSeq.null #1" (MyMseq.null s4) false;
+  utest "MyMSeq.null #2" (MyMseq.null MyMseq.empty) true;
+  (* Iter *)
+  let l = ref [] in
+  MyMseq.iter (fun x -> l := x::!l) s4;
+  utest "MyMSeq.iter" ((List.rev !l) = s4_real) true;
+  (* The end *)
   ()
-
 
 let run_tests () =
   test_mseq () ;
