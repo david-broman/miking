@@ -274,7 +274,7 @@ module Mseq = struct
     let combine l1 l2 =
       let rec work acc l1 l2 =
         match l1, l2 with
-        | Nil, Nil -> Nil
+        | Nil, Nil -> acc
         | Cons(x, xs), Cons(y, ys) -> work (Cons((x,y),acc)) xs ys
         | _,_ -> failwith "Incorrect length of combine"
       in

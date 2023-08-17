@@ -143,12 +143,27 @@ let test_mseq () =
   utest "Mseq.equal #1" true (Mseq.Helpers.equal f s4 s4);
   utest "Mseq.equal #2" false (Mseq.Helpers.equal f s4 s3);
   (* fold_left *)
-  let f a x = a + x in
-  let s4_real_fl = List.fold_left f 0 s4_real in
-  let s4_fl = Mseq.Helpers.fold_left f 0 s4 in
-  utest "Mseq.fold_left" true (s4_fl = s4_real_fl);
-
+  let f1 a x = a + x in
+  let s4_real_fl = List.fold_left f1 0 s4_real in
+  let s4_fl = Mseq.Helpers.fold_left f1 0 s4 in
+  utest "Mseq.fold_left #1" true (s4_fl = s4_real_fl);
+  let f2 a x = x::a in
+  let s4_real_fl = List.fold_left f2 [] s4_real in
+  let s4_fl = Mseq.Helpers.fold_left f2 [] s4 in
+  utest "Mseq.fold_left #1" true (s4_fl = s4_real_fl);
+  (* fold_right *)
+  let f x a = x::a in
+  let s4_real_fr = List.fold_right f s4_real [] in
+  let s4_fr = Mseq.Helpers.fold_right f [] s4 in
+  utest "Mseq.fold_right" true (s4_fr = s4_real_fr);
+  (* combine *)
+  let s4rev_real = List.rev s4_real in
+  let s4rev = Mseq.reverse s4 in
+  let comb_real = List.combine s4rev_real s4_real in
+  let comb = Mseq.Helpers.combine s4rev s4 in
+  utest "Mseq.combine" true (comb_real = (Mseq.Helpers.to_list comb));
 ()
+(*  List.iter (fun (x,y) -> printf "(%d,%d) " x y) comb_real; *)
 
 let run_tests () =
   test_mseq () ;
