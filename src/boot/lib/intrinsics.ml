@@ -198,6 +198,30 @@ module MyMseq = struct
          (i2, Branch(xs', ys'))
     in
     work 0 lst |> snd
+
+  module Helpers = struct
+
+    let to_list s =
+      let rec work acc = function
+        | Nil -> acc
+        | Cons(x, xs) -> work (x::acc) xs
+        | Branch(xs, ys) ->
+           work (work acc xs) ys
+      in
+      work [] s |> List.rev
+
+    let to_seq s = s |> to_list |> List.to_seq
+
+    let of_list l =
+      List.fold_left (fun acc x -> Cons(x, acc)) Nil l |> reverse
+
+    let of_list_list = of_list
+
+    let of_list_rope = of_list
+
+    let of_seq s = s |> List.of_seq |> of_list
+
+  end
 end
 
 (* OLD SEQ *)

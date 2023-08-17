@@ -73,8 +73,9 @@ module MyMseq : sig
   val mapi : (int -> 'a -> 'b) -> 'a t -> 'b t
 
 
- (*
   module Helpers : sig
+    val to_list : 'a t -> 'a list
+
     val to_seq : 'a t -> 'a Seq.t
 
     val of_list : 'a list -> 'a t
@@ -83,8 +84,9 @@ module MyMseq : sig
 
     val of_list_rope : 'a list -> 'a t
 
-    val to_list : 'a t -> 'a list
+    val of_seq : 'a Seq.t -> 'a t
 
+(*
     val of_array : 'a array -> 'a t
 
     val of_array_copy : 'a array -> 'a t
@@ -158,8 +160,8 @@ module MyMseq : sig
      *)
     val map_accum_left :
       ('acc -> 'a -> 'acc * 'b) -> 'acc -> 'a t -> 'acc * 'b t
-  end
    *)
+  end
 end
 
 module Mseq : sig
