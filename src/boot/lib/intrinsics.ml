@@ -221,6 +221,20 @@ module MyMseq = struct
 
     let of_seq s = s |> List.of_seq |> of_list
 
+    let of_array a =
+      Array.fold_left (fun acc x -> Cons(x, acc)) Nil a |> reverse
+
+    let of_array_copy = of_array
+
+    let of_array_list = of_array
+
+    let of_array_rope = of_array
+
+    let to_array l = l |> to_list |> Array.of_list
+
+    let to_array_copy = to_array
+
+
   end
 end
 

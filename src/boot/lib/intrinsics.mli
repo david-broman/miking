@@ -86,7 +86,6 @@ module MyMseq : sig
 
     val of_seq : 'a Seq.t -> 'a t
 
-(*
     val of_array : 'a array -> 'a t
 
     val of_array_copy : 'a array -> 'a t
@@ -99,6 +98,7 @@ module MyMseq : sig
 
     val to_array_copy : 'a t -> 'a array
 
+(*
     val of_ustring : ustring -> int t
 
     val of_ustring_rope : ustring -> int t

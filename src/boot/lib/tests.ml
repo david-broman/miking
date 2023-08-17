@@ -125,6 +125,11 @@ let test_mseq () =
   utest "MyMseq.of_list" true (check_seq (MyMseq.Helpers.of_list s4_real) s4_real);
   let s4_l = MyMseq.Helpers.of_seq (List.to_seq s4_real) in
   utest "MyMseq.of_seq" true (check_seq s4_l s4_real);
+  (* to_array, of_array *)
+  let s4_l = MyMseq.Helpers.to_array s4 |> Array.to_list in
+  utest "MyMseq.to_array" true (s4_l = s4_real);
+  let s4_l = MyMseq.Helpers.of_array (Array.of_list s4_real) in
+  utest "MyMseq.of_array" true (check_seq s4_l s4_real);
   ()
 
 let run_tests () =
