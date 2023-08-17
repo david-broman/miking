@@ -167,7 +167,37 @@ module MyMseq = struct
     (reverse l, reverse r)
 
 
-  
+  let subsequence s a n =
+    let rec work i acc = function
+      | Nil -> (i, acc)
+      | Cons(x, xs) ->
+         if i < a || i >= a + n
+         then work (i+1) acc xs else work (i+1) (Cons(x, acc)) xs
+      | Branch(xs, ys) ->
+         let (i', acc') = work i acc xs in
+         work i' acc' ys
+    in
+    let (_, acc) = work 0 Nil s in
+    reverse acc
+
+  let rec map f = function
+    | Nil -> Nil
+    | Cons(x, xs) -> Cons(f x, map f xs)
+    | Branch(xs, ys) -> Branch(map f xs, map f ys)
+
+  let mapi f lst =
+    let rec work i = function
+      | Nil -> (i, Nil)
+      | Cons(x, xs) ->
+         let x' = f i x in
+         let (i', xs') = work (i+1) xs in
+         (i', Cons(x', xs'))
+      | Branch(xs, ys) ->
+         let (i1, xs') = work i xs in
+         let (i2, ys') = work i1 ys in
+         (i2, Branch(xs', ys'))
+    in
+    work 0 lst |> snd
 end
 
 (* OLD SEQ *)

@@ -105,7 +105,18 @@ let test_mseq () =
   let (s4_a, s4_b) = MyMseq.split_at s4 x_split in
   utest "MyMSeq.split_at #1" true (check_seq s4_a s4_real_a);
   utest "MyMSeq.split_at #2" true (check_seq s4_b s4_real_b);
-
+  (* subsequence *)
+  let s4_sub_real = my_sublist s4_real 7 9 in
+  let s4_sub = MyMseq.subsequence s4 7 9 in
+  utest "MyMSeq.subsequence" true (check_seq s4_sub s4_sub_real);
+  (* map *)
+  let adding x = x + 1000 in
+  let (s, s_real) = (MyMseq.map adding s4, List.map adding s4_real) in
+  utest "MyMSeq.map" true (check_seq s s_real);
+  (* mapi *)
+  let adding_i i x = x + 100 * i in
+  let (s, s_real) = (MyMseq.mapi adding_i s4, List.mapi adding_i s4_real) in
+  utest "MyMSeq.mapi" true (check_seq s s_real);
   (* The end *)
   ()
 

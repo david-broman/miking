@@ -66,29 +66,14 @@ module MyMseq : sig
 
   val split_at : 'a t -> int -> 'a t * 'a t
 
-  (*
-  (* Complexity:
-   * rope (?): O(1), if the rope is flat, otherwise O(n) (flattens)
-   * list (?): O(k + m), where k and m are the int inputs
-   *)
   val subsequence : 'a t -> int -> int -> 'a t
 
-  (* Complexity:
-   * rope (?): O(n*k), where n is the length of the sequence, k is the
-   *   complexity of the function (flattens)
-   * list (?): O(n*k), where n is the length of the sequence, k is the
-   *   complexity of the function
-   *)
   val map : ('a -> 'b) -> 'a t -> 'b t
 
-  (* Complexity:
-   * rope (?): O(n*k), where n is the length of the sequence, k is the
-   *   complexity of the function (flattens)
-   * list (?): O(n*k), where n is the length of the sequence, k is the
-   *   complexity of the function
-   *)
   val mapi : (int -> 'a -> 'b) -> 'a t -> 'b t
 
+
+ (*
   module Helpers : sig
     val to_seq : 'a t -> 'a Seq.t
 
