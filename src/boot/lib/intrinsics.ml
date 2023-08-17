@@ -234,6 +234,17 @@ module MyMseq = struct
 
     let to_array_copy = to_array
 
+    let of_ustring s = s |> ustring2list |> of_list
+
+    let of_ustring_rope = of_ustring
+
+    let of_ustring_list = of_ustring
+
+    let to_ustring l = l |> to_list |> list2ustring
+
+    let to_utf8 l = l |> to_ustring |> Ustring.to_utf8
+
+    let of_utf8 s = s |> Ustring.from_utf8 |> of_ustring
 
   end
 end

@@ -98,7 +98,7 @@ module MyMseq : sig
 
     val to_array_copy : 'a t -> 'a array
 
-(*
+
     val of_ustring : ustring -> int t
 
     val of_ustring_rope : ustring -> int t
@@ -111,6 +111,7 @@ module MyMseq : sig
 
     val of_utf8 : string -> int t
 
+(*
     (* Complexity:
      * rope (?): O(n*k), where n is the length of the sequence, k is the
      *   complexity of the function (flattens)

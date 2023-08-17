@@ -1,5 +1,6 @@
 open Printf
 open Intrinsics
+open Ustring.Op
 
 let utest str l r =
   if l = r then printf "."
@@ -130,6 +131,13 @@ let test_mseq () =
   utest "MyMseq.to_array" true (s4_l = s4_real);
   let s4_l = MyMseq.Helpers.of_array (Array.of_list s4_real) in
   utest "MyMseq.of_array" true (check_seq s4_l s4_real);
+  (* ustring *)
+  let str = "This is a string" in
+  let ustr = us str in
+  let ustr2 = ustr |> MyMseq.Helpers.of_ustring |> MyMseq.Helpers.to_ustring in
+  utest "MyMseq.of_ustring and MyMseq.to_ustring" true (ustr2 =. ustr);
+  let str2 = str |> MyMseq.Helpers.of_utf8 |> MyMseq.Helpers.to_utf8 in
+  utest "MyMseq.of_utf8 and MyMseq.to_utf8" true (str2 = str);
   ()
 
 let run_tests () =
