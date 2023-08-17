@@ -1,6 +1,6 @@
 open Ustring.Op
 
-module Mseq = struct
+module MyMseq = struct
   type 'a t = Nil | Cons of 'a * 'a t | Branch of 'a t * 'a t
 
   type 'a rval = Value of 'a | Index of int
@@ -124,14 +124,23 @@ module Mseq = struct
     | Cons(x,_) -> x
     | Branch(xs,_) -> head xs
 
-  (* Not transforming into cons list. Should it *)
+  let tail = function
+    | Nil -> failwith "tail of empty sequence"
+    | Cons(_, xs) -> xs
+    | l ->
+       (match reverse (reverse l) with
+        | Cons(_, xs) -> xs
+        | Nil | Branch(_,_) -> failwith "cannot happen")
+
+(*
   let rec tail = function
     | Nil -> failwith "tail of empty sequence"
     | Cons(_, xs) -> xs
-    | Branch(xs, ys) ->
+    | Branch(xs, ys) -> Printf.printf "** tail 2 **\n";
        (match tail xs with
         | Nil -> ys (* maintain invariant *)
         | xs' -> Branch(xs', ys))
+ *)
 
   let null = function
     | Nil -> true
@@ -165,7 +174,6 @@ module Mseq = struct
     in
     let (l, r, _) = work Nil Nil 0 s in
     (reverse l, reverse r)
-
 
   let subsequence s a n =
     let rec work i acc = function
@@ -290,15 +298,17 @@ module Mseq = struct
       work a (reverse l1) (reverse l2)
 
     let map_accum_left f a l =
-      let rec work acc = function
-        | Nil -> (acc, Nil)
+      let rec work acc acc_lst = function
+        | Nil -> (acc, acc_lst)
         | Cons(x, xs) ->
            let (acc', x') = f acc x in
-           let (acc'', xs') = work acc' xs in
-           (acc'', Cons(x', xs'))
-        | Branch(_, _) -> failwith "Should not happen"
+           work acc' (Cons(x', acc_lst)) xs
+        | Branch(xs, ys) ->
+           let (acc', acc_lst') = work acc acc_lst xs in
+           work acc' acc_lst' ys
       in
-      work a (reverse l)
+      let (acc', acc_lst') = work a Nil l in
+      (acc', reverse acc_lst')
 
   end
 end
@@ -311,7 +321,7 @@ let do_print = false
 
 let my_prn s = if do_print then Printf.printf "** %s\n" s else ()
 
-module MyMseq = struct
+module Mseq = struct
   type 'a t = List of 'a List.t | Rope of 'a Rope.t
 
   let create_rope n f = Rope (Rope.create_array n f)

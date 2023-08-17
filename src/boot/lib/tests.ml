@@ -162,8 +162,17 @@ let test_mseq () =
   let comb_real = List.combine s4rev_real s4_real in
   let comb = Mseq.Helpers.combine s4rev s4 in
   utest "Mseq.combine" true (comb_real = (Mseq.Helpers.to_list comb));
+  (* fold_right2 *)
+  let f x y a  = (x,y)::a in
+  let s4_real_fr = List.fold_right2 f s4_real (List.rev s4_real) [] in
+  let s4_fr = Mseq.Helpers.fold_right2 f s4 (Mseq.reverse s4) [] in
+  utest "Mseq.fold_right2" true (s4_fr = s4_real_fr);
+  (* map_accum_left *)
+  let f acc x = (x::acc, x * 2) in
+  let (r_a, r_b) = List.fold_left_map f [] s4_real in
+  let (s_a, s_b) = Mseq.Helpers.map_accum_left f [] s4 in
+  utest "Mseq.map_accum_left" true (r_a = s_a && (check_seq s_b r_b));
 ()
-(*  List.iter (fun (x,y) -> printf "(%d,%d) " x y) comb_real; *)
 
 let run_tests () =
   test_mseq () ;
