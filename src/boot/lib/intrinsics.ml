@@ -246,6 +246,14 @@ module MyMseq = struct
 
     let of_utf8 s = s |> Ustring.from_utf8 |> of_ustring
 
+    let equal f v1 v2 =
+      let rec work l1 l2 =
+        match l1, l2 with
+        | Nil, Nil -> true
+        | Cons(x,xs), Cons(y,ys) -> if f x y then work xs ys else false
+        | _ -> failwith "Cannot happen"
+      in
+      work (reverse v1) (reverse v2)
   end
 end
 

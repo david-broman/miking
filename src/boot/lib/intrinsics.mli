@@ -111,14 +111,10 @@ module MyMseq : sig
 
     val of_utf8 : string -> int t
 
-(*
-    (* Complexity:
-     * rope (?): O(n*k), where n is the length of the sequence, k is the
-     *   complexity of the function (flattens)
-     * list (?): O(n*k), where n is the length of the sequence, k is the
-     *   complexity of the function
-     *)
     val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
+
+
+(*
 
     (* Complexity:
      * rope (?): O(n*k), where n is the length of the sequence, k is the

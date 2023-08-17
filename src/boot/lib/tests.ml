@@ -138,7 +138,11 @@ let test_mseq () =
   utest "MyMseq.of_ustring and MyMseq.to_ustring" true (ustr2 =. ustr);
   let str2 = str |> MyMseq.Helpers.of_utf8 |> MyMseq.Helpers.to_utf8 in
   utest "MyMseq.of_utf8 and MyMseq.to_utf8" true (str2 = str);
-  ()
+  (* equal *)
+  let f x y = (x = y) in
+  utest "MyMseq.equal #1" true (MyMseq.Helpers.equal f s4 s4);
+  utest "MyMseq.equal #2" false (MyMseq.Helpers.equal f s4 s3);
+()
 
 let run_tests () =
   test_mseq () ;
