@@ -19,7 +19,7 @@ open Ustring.Op
 (* Sequences using conscat lists - combines cons lists with efficient concatenation.
    Some legacy functions (e.g. is_rope) is kept for compatibility *)
 
-module MyMseq : sig
+module Mseq : sig
   type 'a t
 
   val create : int -> (int -> 'a) -> 'a t
@@ -113,56 +113,22 @@ module MyMseq : sig
 
     val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
 
-
-(*
-
-    (* Complexity:
-     * rope (?): O(n*k), where n is the length of the sequence, k is the
-     *   complexity of the function (flattens)
-     * list (?): O(n*k), where n is the length of the sequence, k is the
-     *   complexity of the function
-     *)
     val fold_left : ('acc -> 'a -> 'acc) -> 'acc -> 'a t -> 'acc
 
-    (* Complexity:
-     * rope (?): O(n*k), where n is the length of the sequence, k is the
-     *   complexity of the function (flattens)
-     * list (?): O(n*k), where n is the length of the sequence, k is the
-     *    complexity of the function
-     *)
     val fold_right : ('a -> 'acc -> 'acc) -> 'acc -> 'a t -> 'acc
 
-    (* Crashes if the two input sequences have different lengths.
-     * Complexity:
-     * rope (?): O(n), where n is the length of the sequences (flattens)
-     * list (?): O(n), where n is the length of the sequences
-     *)
     val combine : 'a t -> 'b t -> ('a * 'b) t
 
-    (* Crashes if the two input sequences have different lengths.
-     * Complexity:
-     * rope (?): O(n*k), where n is the length of the sequence, k is the
-     *   complexity of the function (flattens)
-     * list (?): O(n*k), where n is the length of the sequence, k is the
-     *   complexity of the function
-     *)
     val fold_right2 :
       ('a -> 'b -> 'acc -> 'acc) -> 'a t -> 'b t -> 'acc -> 'acc
 
-    (* Complexity:
-     * rope (?): O(n*k), where n is the length of the sequence, k is the
-     *   complexity of the function (flattens)
-     * list (?): O(n*k), where n is the length of the sequence, k is the
-     *   complexity of the function
-     *)
     val map_accum_left :
       ('acc -> 'a -> 'acc * 'b) -> 'acc -> 'a t -> 'acc * 'b t
-   *)
   end
 end
 
-module Mseq : sig
-  type 'a t = List of 'a List.t | Rope of 'a Rope.t
+module MyMseq : sig
+  type 'a t
 
   (* Defaults to create_rope, see its documentation. *)
   val create : int -> (int -> 'a) -> 'a t
@@ -311,6 +277,8 @@ module Mseq : sig
     val of_list_rope : 'a list -> 'a t
 
     val to_list : 'a t -> 'a list
+
+    val of_seq : 'a Seq.t -> 'a t
 
     val of_array : 'a array -> 'a t
 

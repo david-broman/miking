@@ -1,6 +1,6 @@
 open Ustring.Op
 
-module MyMseq = struct
+module Mseq = struct
   type 'a t = Nil | Cons of 'a * 'a t | Branch of 'a t * 'a t
 
   type 'a rval = Value of 'a | Index of int
@@ -254,16 +254,64 @@ module MyMseq = struct
         | _ -> failwith "Cannot happen"
       in
       work (reverse v1) (reverse v2)
+
+    let fold_left f a l =
+      let rec work acc = function
+        | Nil -> acc
+        | Cons(x, xs) -> work (f acc x) xs
+        | Branch(xs, ys) -> work (work acc xs) ys
+      in
+      work a l
+
+    let fold_right f a l =
+      let rec work acc = function
+        | Nil -> acc
+        | Cons(x, xs) -> f x (work acc xs)
+        | Branch(xs, ys) -> work (work acc ys) xs
+      in
+      work a l
+
+    let combine l1 l2 =
+      let rec work acc l1 l2 =
+        match l1, l2 with
+        | Nil, Nil -> Nil
+        | Cons(x, xs), Cons(y, ys) -> work (Cons((x,y),acc)) xs ys
+        | _,_ -> failwith "Incorrect length of combine"
+      in
+      work Nil (reverse l1) (reverse l2)
+
+    let fold_right2 f l1 l2 a =
+      let rec work acc l1 l2 =
+        match l1, l2 with
+        | Nil, Nil -> acc
+        | Cons(x, xs), Cons(y, ys) -> work (f x y acc) xs ys
+        | _,_ -> failwith "Incorrect length of combine"
+      in
+      work a (reverse l1) (reverse l2)
+
+    let map_accum_left f a l =
+      let rec work acc = function
+        | Nil -> (acc, Nil)
+        | Cons(x, xs) ->
+           let (acc', x') = f acc x in
+           let (acc'', xs') = work acc' xs in
+           (acc'', Cons(x', xs'))
+        | Branch(_, _) -> failwith "Should not happen"
+      in
+      work a (reverse l)
+
   end
 end
 
+
 (* OLD SEQ *)
+
 
 let do_print = false
 
 let my_prn s = if do_print then Printf.printf "** %s\n" s else ()
 
-module Mseq = struct
+module MyMseq = struct
   type 'a t = List of 'a List.t | Rope of 'a Rope.t
 
   let create_rope n f = Rope (Rope.create_array n f)
@@ -429,6 +477,13 @@ module Mseq = struct
         List (List.mapi f s)
 
   module Helpers = struct
+
+    let to_list = function
+      | Rope s ->
+          Rope.Convert.to_list_array s
+      | List s ->
+         s
+
     let to_seq = function
       | Rope s ->
           Array.to_seq (Rope.Convert.to_array_array s)
@@ -437,13 +492,13 @@ module Mseq = struct
 
     let of_list_rope l = Rope (Rope.Convert.of_list_array l)
 
+    let of_list = of_list_rope
+
+    let of_list_rope l = Rope (Rope.Convert.of_list_array l)
+
     let of_list_list l = List l
 
-    let to_list = function
-      | Rope s ->
-          Rope.Convert.to_list_array s
-      | List s ->
-          s
+    let of_seq s = s |> List.of_seq |> of_list
 
     let of_array_rope a = Rope (Rope.Convert.of_array_array a)
 
